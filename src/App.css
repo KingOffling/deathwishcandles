@@ -1,3 +1,8 @@
+body {
+  background-color: #000000; /* Your preferred background color */
+}
+
+
 .App {
   text-align: center;
 }
@@ -36,3 +41,59 @@
     transform: rotate(360deg);
   }
 }
+
+.candle-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.candle-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 15px;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.candle-image:hover {
+  transform: rotate(2deg);
+}
+
+.scrolling-skulls-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  overflow-y: auto; 
+  width: calc(55px * 73); /* Width of one row */
+  height: calc(55px * 5); /* Height of five rows */
+  /*animation: scrollLeft 10s linear infinite; /* Apply the animation here */
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50px * 73 * 2)); /* Double the width for duplicate content */
+  }
+}
+
+
+
+.skull-image {
+  width: 50px;
+  height: 50px;
+  border: 1px solid white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.skull-image:hover {
+  transform: scale(200%);
+}
+
+
