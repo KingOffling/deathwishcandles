@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Box, Text, VStack, Center, ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Button, Box, Text, VStack, Center, ChakraProvider, extendTheme, Image } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import candlesABI from './candlesABI.json';
 import skullsABI from './skullsABI.json';
 import rareCandle from './images/candles/rare.png';
 import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
+import logo from './images/logo.png';
 import './App.css';
 
 const theme = extendTheme({
@@ -32,17 +33,22 @@ function App() {
   const skullsContract = new ethers.Contract(skullsAddress, skullsABI, provider);
 
   const [candleQuantities, setCandleQuantities] = useState({ 1: 0, 2: 0, 3: 0 });
-  const [loadedGrids, setLoadedGrids] = useState(1); // Start with 1 grid loaded
-  const [skullsLoaded, setSkullsLoaded] = useState(10); // Load 10 skulls initially
 
+
+  const skullSize = 55; // Size of each skull including gap
+  const skullsPerRow = Math.floor(window.innerWidth / skullSize);
+  const rowsPerScreen = Math.floor(window.innerHeight / skullSize);
+  const initialSkullsCount = skullsPerRow * rowsPerScreen;
+  const [skullsLoaded, setSkullsLoaded] = useState(initialSkullsCount);
 
 
 
   //#region QUERY TOKENS
   /////////////////////////
   useEffect(() => {
-    if (userAddress){
-    queryCandles(provider);}
+    if (userAddress) {
+      queryCandles(provider);
+    }
   }, [userAddress]);
 
   const queryCandles = async (provider) => {
@@ -69,7 +75,7 @@ function App() {
         }
       } catch (error) {
         if (error.code === 'CALL_EXCEPTION') {
-//          console.log(`Skull ID ${id} does not exist or other error`);
+          //          console.log(`Skull ID ${id} does not exist or other error`);
         } else {
           console.error("Unexpected error querying skulls:", error);
           break; // Optional: break out of the loop if a non-expected error occurs
@@ -78,7 +84,7 @@ function App() {
     }
   };
   //#endregion
- 
+
   //#region WALLET CONNECTOR
   /////////////////////////
 
@@ -96,11 +102,11 @@ function App() {
         await queryCandles(provider); // Fetch candles for the new address
       }
     };
-  
+
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
-  
+
     // Clean up the event listener when the component unmounts
     return () => {
       if (window.ethereum) {
@@ -108,8 +114,8 @@ function App() {
       }
     };
   }, []); // This effect does not depend on any state or props
-  
-  
+
+
 
 
   // wallet connector
@@ -119,16 +125,16 @@ function App() {
         alert('Please install MetaMask!');
         return;
       }
-  
+
       // Request account access
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
-  
+
       // Get the user's address
       const address = await signer.getAddress();
       console.log('Connected with address:', address);
-      
+
       // Set state
       setIsWalletConnected(true);
       setUserAddress(address);
@@ -139,100 +145,103 @@ function App() {
       setUserAddress('');
     }
   }
-  
-  
-  
-    //#endregion
 
-//#region SHOW CANDLES
-////////////////////////////
-const DisplayCandles = ({ candleQuantities }) => {
-  const getCandleImage = (tokenId) => {
-    switch (tokenId) {
-      case 1:
-        return rareCandle;
-      case 2:
-        return uncommonCandle;
-      case 3:
-        return commonCandle;
-      default:
-        return null;
-    }
+
+
+  //#endregion
+
+  //#region SHOW CANDLES
+  ////////////////////////////
+  const DisplayCandles = ({ candleQuantities }) => {
+    const getCandleImage = (tokenId) => {
+      switch (tokenId) {
+        case 1:
+          return rareCandle;
+        case 2:
+          return uncommonCandle;
+        case 3:
+          return commonCandle;
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <div className="candle-container">
+        {Object.entries(candleQuantities).flatMap(([tokenId, quantity]) =>
+          Array.from({ length: quantity }, (_, index) => (
+            <img
+              key={`${tokenId}-${index}`}
+              src={getCandleImage(parseInt(tokenId, 10))}
+              alt="Candle"
+              className="candle-image"
+            />
+          ))
+        )}
+      </div>
+    );
   };
-
-  return (
-    <div className="candle-container">
-      {Object.entries(candleQuantities).flatMap(([tokenId, quantity]) =>
-        Array.from({ length: quantity }, (_, index) => (
-          <img
-            key={`${tokenId}-${index}`}
-            src={getCandleImage(parseInt(tokenId, 10))}
-            alt="Candle"
-            className="candle-image"
-          />
-        ))
-      )}
-    </div>
-  );
-};
-//#endregion
+  //#endregion
 
   //#region SCROLLING FOREVER
- ////////////////////////////
- useEffect(() => {
-  const handleScroll = () => {
-    // Check if the user is near the bottom
-    if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100) {
-      setSkullsLoaded(skullsLoaded => skullsLoaded + 10); // Load 10 more skulls
+  ////////////////////////////
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        setSkullsLoaded(skullsLoaded => skullsLoaded + skullsPerRow);
+      }
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+  
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [skullsPerRow]);
+  
+
+
+  //endregion
+
+  //#region SHOW SKULLS
+  //////////////////////////
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-  };
-
-  window.addEventListener('scroll', handleScroll);
-
-  return () => {
-    window.removeEventListener('scroll', handleScroll);
-  };
-}, []);
-
-
-//endregion
-
-//#region SHOW SKULLS
-//////////////////////////
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    return array;
   }
-  return array;
-}
 
-
-const ScrollingSkullsGrid = () => {
-  const createSkullImages = (count) => {
-    let skulls = [];
-    for (let i = 1; i <= count; i++) {
-      let formattedId = String(i % 365).padStart(3, '0'); // Use modulo for infinite effect
-      let imgSrc = `/images/skulls/DW365-${formattedId}.jpg`;
-      skulls.push(
-        <img 
-          key={i} 
-          src={imgSrc} 
-          alt={`Skull ${i}`} 
-          className="skull-image"
-        />
-      );
-    }
-    // Shuffle the array of skulls here
-    return shuffleArray(skulls);
+  const loadMoreSkulls = () => {
+    setSkullsLoaded(current => current + 19); // Load another row of skulls
   };
 
-  return (
-    <div className="scrolling-skulls-grid">
+  const ScrollingSkullsGrid = () => {
+    const createSkullImages = (count) => {
+      let skulls = [];
+      for (let i = 1; i <= count; i++) {
+        let formattedId = String(((i - 1) % 365) + 1).padStart(3, '0');
+        let imgSrc = `/images/skulls/DW365-${formattedId}.jpg`;
+        skulls.push(
+          <img
+            key={i}
+            src={imgSrc}
+            alt={`Skull ${i}`}
+            className="skull-image"
+          />
+        );
+      }
+      return shuffleArray(skulls);
+    };
+
+    return (
+      <div className="scrolling-skulls-grid">
       {createSkullImages(skullsLoaded)}
     </div>
-  );
-};
+    );
+  };
+  // #endregion
 
 
 
@@ -248,11 +257,12 @@ const ScrollingSkullsGrid = () => {
   return (
     <ChakraProvider theme={theme}>
       <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500">
-      {isWalletConnected
-       && candleQuantities && <Text color="white" fontSize="x-large">Select Your Candle</Text>}
-      {candleQuantities && <DisplayCandles candleQuantities={candleQuantities} />}
-        <Button 
-          colorScheme="red" 
+        <Image src={logo} width="400px"></Image>
+        {isWalletConnected
+          && candleQuantities && <Text color="white" fontSize="x-large">Select Your Candle</Text>}
+        {candleQuantities && <DisplayCandles candleQuantities={candleQuantities} />}
+        <Button
+          colorScheme="red"
           onClick={!isWalletConnected ? connectWallet : null}
           m={4}
         >
@@ -264,23 +274,21 @@ const ScrollingSkullsGrid = () => {
           </Text>
         ) : (
           <Text color="white" fontSize="small" opacity={0}>
-            Placeholder
+            .
           </Text>
         )}
-          return (
-  <div>
-    {Array.from({ length: loadedGrids }).map((_, index) => (
-      <ScrollingSkullsGrid key={index} />
-    ))}
-  </div>
-);
+        return (
+        <div>
+        <ScrollingSkullsGrid />
+        </div>
+        );
 
 
       </VStack>
     </ChakraProvider>
   );
-//#endregion
-  
+  //#endregion
+
 }
 
 export default App;

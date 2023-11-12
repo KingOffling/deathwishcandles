@@ -67,33 +67,18 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  overflow-y: auto; 
-  width: calc(55px * 73); /* Width of one row */
-  height: calc(55px * 5); /* Height of five rows */
-  /*animation: scrollLeft 10s linear infinite; /* Apply the animation here */
+  justify-content: center; /* Center skulls if they don't fill the entire width */
 }
-
-@keyframes scrollLeft {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(calc(-50px * 73 * 2)); /* Double the width for duplicate content */
-  }
-}
-
-
 
 .skull-image {
+  flex: 0 0 auto; /* Do not grow or shrink */
   width: 50px;
-  height: 50px;
   border: 1px solid white;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
 }
 
 .skull-image:hover {
-  transform: scale(200%);
+  transform: scale(2); /* Enlarge on hover */
 }
-
 
