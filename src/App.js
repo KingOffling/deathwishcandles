@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Box, Text, VStack, Center, ChakraProvider, extendTheme, Image } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Button, Text, VStack, ChakraProvider, extendTheme, Image } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import candlesABI from './candlesABI.json';
 import skullsABI from './skullsABI.json';
@@ -24,6 +24,7 @@ function App() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
   const provider = new ethers.providers.Web3Provider(window.ethereum);
+  // eslint-disable-next-line no-unused-vars
   const signer = provider.getSigner();
 
   const candlesAddress = "0x521945fDCEa1626E056E89A3abBDEe709cf3a837";
@@ -49,6 +50,7 @@ function App() {
     if (userAddress) {
       queryCandles(provider);
     }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
 
   const queryCandles = async (provider) => {
@@ -65,6 +67,7 @@ function App() {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const querySkull = async (provider, tokenID) => {
     const maxId = 365; // or use totalSupply if available
     for (let id = 1; id <= maxId; id++) {
@@ -113,6 +116,7 @@ function App() {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       }
     };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // This effect does not depend on any state or props
 
 
@@ -213,6 +217,7 @@ function App() {
     return array;
   }
 
+  // eslint-disable-next-line no-unused-vars
   const loadMoreSkulls = () => {
     setSkullsLoaded(current => current + 19); // Load another row of skulls
   };
@@ -257,7 +262,7 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500">
-        <Image src={logo} width="400px"></Image>
+        <Image src={logo} width="400px" marginTop={"50px"}></Image>
         {isWalletConnected
           && candleQuantities && <Text color="white" fontSize="x-large">Select Your Candle</Text>}
         {candleQuantities && <DisplayCandles candleQuantities={candleQuantities} />}
