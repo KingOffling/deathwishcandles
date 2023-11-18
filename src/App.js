@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Button, Text, VStack, ChakraProvider, extendTheme, Image,
-  Modal, useDisclosure
+  Modal, useDisclosure, HStack
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import candlesABI from './candlesABI.json';
@@ -168,6 +168,11 @@ function App() {
           <Text color="white" fontSize="small" opacity={0}>.</Text>
         }
         <ScrollingSkullsGrid />
+        <HStack spacing={4} m={"20px"}>
+            <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
+            <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
+            <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">OpenSea</a>
+        </HStack>
       </VStack>
     </ChakraProvider>
   );
