@@ -112,7 +112,17 @@ function App() {
           onClick={() => { setSelectedSkullId(formattedId); onOpen(); }}
         />
       );
+
     });
+
+    allSkulls.push(
+      <img
+        key="endcap"
+        src="/endcap.png"
+        alt="End Cap"
+        className="endcap"
+      />
+    );
 
     return (
       <div>

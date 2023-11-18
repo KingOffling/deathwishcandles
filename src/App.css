@@ -77,7 +77,8 @@ body {
 
 .skull-image {
   flex: 0 0 auto; /* Do not grow or shrink */
-  width: 19%;
+  width: 9%;
+  width: 9%;
   border: 1px solid white;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
@@ -87,5 +88,9 @@ body {
   transform: scale(2); /* Enlarge on hover */
 }
 
+.endcap {
+  flex: 0 0 auto;
+  width: calc(45% + 20px);
+}
 
 
