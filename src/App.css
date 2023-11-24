@@ -1,6 +1,14 @@
 body {
   background-color: #000000; /* Your preferred background color */
+  font-family: 'Rockledge', sans-serif;
 }
+
+
+@font-face {
+  font-family: 'Rockledge';
+  src: url('./fonts/rockledge.ttf') format('truetype');
+}
+
 
 
 .App {
@@ -65,6 +73,9 @@ body {
 
 .candle-image.selected {
   border: 2px solid red;
+}
+.candle-image.non-selected {
+  filter: grayscale(100%);
 }
 
 
