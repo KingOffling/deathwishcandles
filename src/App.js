@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Button, Text, VStack, ChakraProvider, extendTheme, Image,
-  Modal, useDisclosure, HStack, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody
+  Modal, HStack, ModalOverlay, ModalContent, ModalHeader, ModalBody
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import candlesABI from './candlesABI.json';
@@ -26,7 +26,6 @@ function App() {
   const [userAddress, setUserAddress] = useState('');
   const [candleQuantities, setCandleQuantities] = useState({ 1: 0, 2: 0, 3: 0 });
   const [selectedCandle, setSelectedCandle] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedSkullId, setSelectedSkullId] = useState(null);
   const [buttonText, setButtonText] = useState('Loading...');
   const [buttonColor, setButtonColor] = useState('grey');
@@ -138,13 +137,6 @@ function App() {
   //#endregion
 
   // #region Skull Grid Management
-  const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
 
   const handleSkullClick = async (formattedId) => {
     console.log("Skull clicked: ", formattedId);
