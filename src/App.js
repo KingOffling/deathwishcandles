@@ -307,7 +307,7 @@ function App() {
         <HStack spacing={4} m={"20px"}>
           <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
           <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
-          <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">OpenSea</a>
+          <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">Discord</a>
         </HStack>
       </VStack>
     </ChakraProvider>
