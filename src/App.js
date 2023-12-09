@@ -71,7 +71,7 @@ function App() {
   };
 
 
-  const getEnsName = async (address) => {
+  const getEnsName = useCallback(async (address) => {
     try {
       const ensName = await provider.lookupAddress(address);
       return ensName;
@@ -79,7 +79,8 @@ function App() {
       console.error("Error resolving ENS name:", error);
       return null;
     }
-  };
+  }, [provider]);
+  
   
   const formatAddress = (address) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
@@ -165,6 +166,7 @@ function App() {
   }
   };
 
+  // #endregion
 
   // #region Token Ownership
   const checkTokenOwnership = async (tokenId) => {
@@ -199,6 +201,8 @@ function App() {
 
   // #endregion
 
+ // #region Skull Grid
+ 
   const ScrollingSkullsGrid = () => {
 
     const skulls = Array.from({ length: 365 }, (_, i) => {
