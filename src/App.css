@@ -1,15 +1,12 @@
 body {
-  background-color: #000000; /* Your preferred background color */
+  background-color: #000000;
   font-family: 'Rockledge', sans-serif;
 }
-
 
 @font-face {
   font-family: 'Rockledge';
   src: url('./fonts/rockledge.ttf') format('truetype');
 }
-
-
 
 .App {
   text-align: center;
@@ -74,21 +71,20 @@ body {
 .candle-image.selected {
   border: 2px solid red;
 }
+
 .candle-image.non-selected {
   filter: grayscale(100%);
 }
-
 
 .scrolling-skulls-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  justify-content: center; /* Center skulls if they don't fill the entire width */
+  justify-content: center;
 }
 
 .skull-image {
-  flex: 0 0 auto; /* Do not grow or shrink */
-  width: 9%;
+  flex: 0 0 auto;
   width: 9%;
   border: 1px solid white;
   cursor: pointer;
@@ -96,7 +92,7 @@ body {
 }
 
 .skull-image:hover {
-  transform: scale(2); /* Enlarge on hover */
+  transform: scale(2);
 }
 
 .endcap {
@@ -111,7 +107,7 @@ body {
 
 .image-overlay-container:hover .overlay-text {
   display: flex;
-  opacity: 0.7; /* Adjust the opacity value as needed */
+  opacity: 0.7;
   transition: opacity 1s ease-in-out;
 }
 
@@ -119,7 +115,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  background: rgba(0, 0, 0, 0.95); /* Very dark overlay */
+  background: rgba(0, 0, 0, 0.95);
   color: white;
   width: 100%;
   height: 100%;
@@ -127,28 +123,23 @@ body {
   flex-direction: column;
   opacity: 0;
   transition: opacity 1s ease-in-out;
-  padding: 30px; /* Increase padding */
+  padding: 30px;
 }
 
 .description-text {
   color: #dbd68c;
-  font-size: 14px; /* Adjust font size as needed */
+  font-size: 14px;
 }
 
 .author-text {
   color: #dbaa72;
-  font-size: 12px; /* Adjust font size as needed */
+  font-size: 12px;
 }
 
-
 .blur-background {
-  filter: blur(8px); /* Adjust the blur intensity as needed */
+  filter: blur(8px);
 }
 
 @media screen and (max-width: 768px) {
   /* Mobile-specific styles go here */
 }
-
-
-
-
