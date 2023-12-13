@@ -138,6 +138,9 @@ body {
   color: #dbaa72;
 }
 
+.blur-background {
+  filter: blur(8px);
+}
 
 
 

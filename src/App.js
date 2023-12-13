@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Button, Text, VStack, ChakraProvider, extendTheme, Image,
-  Modal, HStack, ModalOverlay, ModalContent, ModalHeader, ModalBody
+  Button, Text, VStack, ChakraProvider, extendTheme, Image, Spinner,
+  Modal, HStack, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import candlesABI from './candlesABI.json';
@@ -28,14 +28,30 @@ function App() {
   const [selectedCandle, setSelectedCandle] = useState(null);
   const [selectedSkullId, setSelectedSkullId] = useState(null);
   const [buttonText, setButtonText] = useState('Loading...');
-  const [buttonColor, setButtonColor] = useState('grey');
+  const [buttonColor, setButtonColor] = useState('black');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [displayAddress, setDisplayAddress] = useState('');
   const [skullDescription, setSkullDescription] = useState('');
   const [quoteAuthor, setQuoteAuthor] = useState('');
   const [mintedDate, setMintedDate] = useState('');
   const [prestigeStatus, setPrestigeStatus] = useState('');
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [isModalContentLoading, setIsModalContentLoading] = useState(false);
 
+  // eslint-disable-next-line
+  const [selectedCandleImage, setSelectedCandleImage] = useState(null);
+  // eslint-disable-next-line
+  const [selectedSkullImage, setSelectedSkullImage] = useState(null);
+
+  const getCandleImage = (tokenId) => {
+    switch (tokenId) {
+      case 1: return rareCandle;
+      case 2: return uncommonCandle;
+      case 3: return commonCandle;
+      default: return null;
+    }
+  };
 
 
   const readOnlyProvider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/edd1ef15a39f46a495d9441c6bdb9c45");
@@ -80,8 +96,8 @@ function App() {
       return null;
     }
   }, [provider]);
-  
-  
+
+
   const formatAddress = (address) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
@@ -152,57 +168,69 @@ function App() {
   const handleSkullClick = async (formattedId) => {
     console.log("Skull clicked: ", formattedId);
     setSelectedSkullId(formattedId);
-    setIsModalOpen(true); // Open modal
-    setButtonText('Loading...');
-    setButtonColor('grey');
-    await checkTokenOwnership(formattedId);
+    setIsModalContentLoading(true);
 
-    const metadata = await fetchSkullMetadata(formattedId);
-  if (metadata) {
-    setSkullDescription(metadata.description);
-    setQuoteAuthor(metadata.quoteAuthor);
-    setMintedDate(formatDate(metadata.mintedDate));
-    setPrestigeStatus(metadata.prestigeStatus);
-  }
-  };
-
-  // #endregion
-
-  // #region Token Ownership
-  const checkTokenOwnership = async (tokenId) => {
     try {
-        console.log(`Checking ownership for token ID: ${tokenId}`);
-        const owner = await skullsContract.ownerOf(tokenId);
-        console.log(`Owner of the token: ${owner}`);
+      // eslint-disable-next-line
+        const [ownershipData, metadata] = await Promise.all([
+            checkTokenOwnership(formattedId),
+            fetchSkullMetadata(formattedId)
+        ]);
 
-        const ensName = await getEnsName(owner);
-        console.log("ENS Name: ", ensName);  // Debug log
-
-        let displayText;
-        if (ensName) {
-            displayText = ensName; // Full ENS name
-        } else {
-            displayText = `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
+        if (metadata) {
+            setSkullDescription(metadata.description);
+            setQuoteAuthor(metadata.quoteAuthor);
+            setMintedDate(formatDate(metadata.mintedDate));
+            setPrestigeStatus(metadata.prestigeStatus);
         }
-        
-        console.log(`Display Text: ${displayText}`); // Debug log
-        setButtonText(
-            <>
-                Owned by:<br />
-                {displayText}
-            </>
-        );
-        setButtonColor('black');
+        setIsModalOpen(true);
     } catch (error) {
-        console.error("Error checking token ownership:", error);
+        console.error("Error fetching data for skull:", error);
+        // Handle error appropriately
+    } finally {
+        setIsModalContentLoading(false);
     }
 };
 
 
   // #endregion
 
- // #region Skull Grid
- 
+  // #region Token Ownership
+  const checkTokenOwnership = async (tokenId) => {
+    try {
+      console.log(`Checking ownership for token ID: ${tokenId}`);
+      const owner = await skullsContract.ownerOf(tokenId);
+      console.log(`Owner of the token: ${owner}`);
+  
+      if (owner.toLowerCase() === userAddress.toLowerCase()) {
+        if (prestigeStatus !== "Undetermined") {
+          setButtonText("Complete");
+          setButtonColor("gold");
+        } else {
+          setButtonText("Perform Ritual");
+          setButtonColor("red.500");
+        }
+      } else {
+        const ensName = await getEnsName(owner);
+        let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
+        setButtonText(
+          <>
+            Owned by:<br />
+            {displayText}
+          </>
+        );
+        setButtonColor('black.500');
+      }
+    } catch (error) {
+      console.error("Error checking token ownership:", error);
+    }
+  };
+
+
+  // #endregion
+
+  // #region Skull Grid
+
   const ScrollingSkullsGrid = () => {
 
     const skulls = Array.from({ length: 365 }, (_, i) => {
@@ -228,20 +256,18 @@ function App() {
       />
     );
 
-// #endregion
+    // #endregion
 
- // #region Skull Grid Modal
+    // #region Skull Grid Modal
 
     return (
       <div>
         <div className="scrolling-skulls-grid">{skulls}</div>
         {selectedSkullId && (
-          <Modal isOpen={isModalOpen} onClose={() => {setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('grey');}}>
-          {console.log('Rendering Modal...')}
+          <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }}>
+            {console.log('Rendering Modal...')}
 
             <ModalOverlay />
-
-            
             <ModalContent>
               <ModalHeader
                 textAlign="center"
@@ -263,54 +289,48 @@ function App() {
                     boxSize="400px"
                     border="2px solid black"
                   />
-<div className="overlay-text">
-  <Text
-    style={{
-      color: "white",
-      fontSize: calculateFontSize(),
-      overflowWrap: "break-word",
-      textAlign: "left",
-      padding: "10px",
-      marginBottom: "auto", // Pushes the author to the bottom
-    }}
-    className="description-text"
-  >
-    {skullDescription}
-  </Text>
-  <Text
-    style={{
-      color: "white",
-      fontSize: calculateFontSize(),
-      overflowWrap: "break-word",
-      textAlign: "right",
-      padding: "10px"
-    }}
-    className="author-text"
-  >
-    {quoteAuthor}
-  </Text>
-</div>
-
-
+                  <div className="overlay-text">
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: calculateFontSize(),
+                        overflowWrap: "break-word",
+                        textAlign: "left",
+                        padding: "10px",
+                        marginBottom: "auto", 
+                      }}
+                      className="description-text"
+                    >
+                      {skullDescription}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: calculateFontSize(),
+                        overflowWrap: "break-word",
+                        textAlign: "right",
+                        padding: "10px"
+                      }}
+                      className="author-text"
+                    >
+                      {quoteAuthor}
+                    </Text>
+                  </div>
                 </div>
                 <Text color="black" fontFamily={"Arial"} fontSize="12px">
                   {mintedDate}
                 </Text>
+                {isModalContentLoading ? (
+        <Spinner /> 
+    ) : (
                 <Button
-                  style={{ 
-                    backgroundColor: buttonColor, 
-                    color: 'white', 
-                    padding: '4px 8px'
-                  }}
-                  width={"60%"}
-                  mt="10px"
-                  alignSelf={"center"}
-                  border={"1px"}
-                  borderColor={"black"}
-                  onClick={handleButtonClick}
-                >
-                  {buttonText}
-                </Button>
+    colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
+    mt="10px"
+    alignSelf={"center"}
+    onClick={handleButtonClick}
+  >
+    {buttonText}
+  </Button>)}
               </ModalBody>
 
             </ModalContent>
@@ -325,73 +345,103 @@ function App() {
   //#endregion
 
   // #region Button Pushing
-  
+
   const handleButtonClick = () => {
     const skullIdNumber = parseInt(selectedSkullId, 10);
     const url = `https://opensea.io/assets/ethereum/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${skullIdNumber}`;
     window.open(url, '_blank');
   };
+
+
+  // #endregion
+
+  // #region Perform Ritual
+  const performRitual = () => {
+    if (!selectedCandle || !selectedSkullId) {
+      showMessageModal('Please select both a candle and a skull to continue.');
+      return;
+    }
+    if (selectedCandle && selectedSkullId) {
+      setSelectedCandleImage(getCandleImage(selectedCandle));
+      setSelectedSkullImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
+      setIsModalOpen(true);
+    } else {
+      alert('Please select both a candle and a skull to continue.');
+    }
+  };
+
+
+  // #endregion
+
+  // #region Message Modal
+
+  const showMessageModal = (message) => {
+    setModalMessage(message);
+    setIsMessageModalOpen(true);
+  };
   
-  
+
   // #endregion
 
   // #region Metadata Collection
 
-    const formatDate = (unixTimestamp) => {
-      const date = new Date(unixTimestamp * 1000);
-      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-    };
-    
-    const fetchSkullMetadata = async (id) => {
-      const skullIdNumber = parseInt(id, 10);
-      const metadataUrl = `https://metadata.deathwishnft.io/metadata/${skullIdNumber}`;
-      try {
-        const response = await fetch(metadataUrl);
-        const metadata = await response.json();
-        return {
-          description: metadata.description,
-          quoteAuthor: metadata.attributes.find(attr => attr.trait_type === "Quote Author")?.value,
-          mintedDate: metadata.attributes.find(attr => attr.trait_type === "Minted")?.value,
-          prestigeStatus: metadata.attributes.find(attr => attr.trait_type === "Prestige Status")?.value,
-        };
-      } catch (error) {
-        console.error("Error fetching metadata:", error);
-        return null;
-      }
-    };
+  const formatDate = (unixTimestamp) => {
+    const date = new Date(unixTimestamp * 1000);
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  };
 
-    const getPrestigeStatusStyle = (status) => {
-      const baseStyle = { fontFamily: "Rockledge, sans-serif",
-      letterSpacing: "2px"};   
-      switch (status) {
-        case "Mythic":
-          return { ...baseStyle, color: "#e69a0e" };
-        case "Epic":
-          return { ...baseStyle, color: "#ba03fc" };
-        case "Rare":
-          return { ...baseStyle, color: "#39c0e0" };
-        case "Uncommon":
-          return { ...baseStyle, color: "#66f28b" };
-        case "Common":
-        case "Undetermined":
-          return { ...baseStyle, color: "#c7c7c7" };
-        default:
-          return baseStyle;
-      }
+  const fetchSkullMetadata = async (id) => {
+    const skullIdNumber = parseInt(id, 10);
+    const metadataUrl = `https://metadata.deathwishnft.io/metadata/${skullIdNumber}`;
+    try {
+      const response = await fetch(metadataUrl);
+      const metadata = await response.json();
+      return {
+        description: metadata.description,
+        quoteAuthor: metadata.attributes.find(attr => attr.trait_type === "Quote Author")?.value,
+        mintedDate: metadata.attributes.find(attr => attr.trait_type === "Minted")?.value,
+        prestigeStatus: metadata.attributes.find(attr => attr.trait_type === "Prestige Status")?.value,
+      };
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+      return null;
+    }
+  };
+
+  const getPrestigeStatusStyle = (status) => {
+    const baseStyle = {
+      fontFamily: "Rockledge, sans-serif",
+      letterSpacing: "2px"
     };
-    
-    const calculateFontSize = () => {
-      const combinedLength = skullDescription.length + quoteAuthor.length;
-      
-      if (combinedLength < 50) {
-        return '48px'; 
-      } else if (combinedLength < 100) {
-        return '40px'; 
-      } else {
-        return '32px'; 
-      }
-    };
-    
+    switch (status) {
+      case "Mythic":
+        return { ...baseStyle, color: "#e69a0e" };
+      case "Epic":
+        return { ...baseStyle, color: "#ba03fc" };
+      case "Rare":
+        return { ...baseStyle, color: "#39c0e0" };
+      case "Uncommon":
+        return { ...baseStyle, color: "#66f28b" };
+      case "Common":
+      case "Undetermined":
+        return { ...baseStyle, color: "#c7c7c7" };
+      default:
+        return baseStyle;
+    }
+  };
+
+  const calculateFontSize = () => {
+    const combinedLength = skullDescription.length + quoteAuthor.length;
+
+    if (combinedLength < 50) {
+      return '48px';
+    } else if (combinedLength < 100) {
+      return '40px';
+    } else {
+      return '32px';
+    }
+  };
+
 
   // #endregion
 
@@ -423,8 +473,25 @@ function App() {
   }, [queryCandles, getEnsName]);
   // #endregion
 
-  return (
+  return (   
     <ChakraProvider theme={theme}>
+
+<div className={isModalOpen ? "blur-background" : ""}>
+      <Modal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Ritual Update</ModalHeader>
+          <ModalBody>
+            <Text>{modalMessage}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={() => setIsMessageModalOpen(false)}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500">
         <Image src={logo} width="400px" marginTop={"50px"} />
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
@@ -432,28 +499,31 @@ function App() {
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Define Prestige</Text>
         {isWalletConnected && <DisplayCandles />}
         <Button
-          colorScheme="red"
-          onClick={!isWalletConnected ? connectWallet : () => {/* perform ritual action */ }}
-          m={4}
-        >
-          {selectedCandle ? 'Perform Ritual' : 'Connect Wallet'}
-        </Button>
+  colorScheme="red"
+  onClick={!isWalletConnected ? connectWallet : performRitual}
+  m={4}
+>
+  {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
+</Button>
+
         {isWalletConnected ?
           <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
           <Text color="white" fontSize="small" opacity={0}>.</Text>
         }
-            <ScrollingSkullsGrid
-      selectedSkullId={selectedSkullId}
-      setSelectedSkullId={setSelectedSkullId}
-      isModalOpen={isModalOpen}
-    />
+        <ScrollingSkullsGrid
+          selectedSkullId={selectedSkullId}
+          setSelectedSkullId={setSelectedSkullId}
+          isModalOpen={isModalOpen}
+        />
         <HStack spacing={4} m={"20px"}>
           <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
           <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
           <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">Discord</a>
         </HStack>
       </VStack>
+      </div>
     </ChakraProvider>
+    
   );
 
 }
