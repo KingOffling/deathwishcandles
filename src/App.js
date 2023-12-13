@@ -432,15 +432,18 @@ function App() {
 
   const calculateFontSize = () => {
     const combinedLength = skullDescription.length + quoteAuthor.length;
-
-    if (combinedLength < 50) {
-      return '48px';
-    } else if (combinedLength < 100) {
-      return '40px';
-    } else {
-      return '32px';
-    }
+    const baseFontSize = 48; // Starting font size
+    const fontSizeDecreaseRate = 8; // Decrease rate per 50 characters
+    const minFontSize = 20; // Minimum font size you want
+  
+    const fontSize = Math.max(
+      baseFontSize - Math.floor(combinedLength / 50) * fontSizeDecreaseRate,
+      minFontSize
+    );
+  
+    return `${fontSize}px`;
   };
+  
 
 
   // #endregion
