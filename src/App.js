@@ -10,6 +10,7 @@ import rareCandle from './images/candles/rare.png';
 import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
 import logo from './images/logo.png';
+        // eslint-disable-next-line
 import MobileVersion from './MobileVersion'; 
 import './App.css';
 
@@ -23,6 +24,7 @@ const theme = extendTheme({
 });
 
 function App() {
+          // eslint-disable-next-line
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
