@@ -9,7 +9,8 @@ import skullsABI from './skullsABI.json';
 import rareCandle from './images/candles/rare.png';
 import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
-import logo from './images/logo.png';
+import logo from './images/logo.png';v
+import MobileVersion from './MobileVersion'; 
 import './App.css';
 
 
@@ -22,6 +23,19 @@ const theme = extendTheme({
 });
 
 function App() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
+  
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
   const [candleQuantities, setCandleQuantities] = useState({ 1: 0, 2: 0, 3: 0 });
@@ -484,7 +498,11 @@ function App() {
   }, [queryCandles, getEnsName]);
   // #endregion
 
-  return (   
+  return (
+    <div>
+      {isMobile ? (
+        <MobileVersion /> 
+      ) : (   
     <ChakraProvider theme={theme}>
 
 <div className={isModalOpen ? "blur-background" : ""}>
@@ -534,7 +552,8 @@ function App() {
       </VStack>
       </div>
     </ChakraProvider>
-    
+    )}
+    </div>
   );
 
 }

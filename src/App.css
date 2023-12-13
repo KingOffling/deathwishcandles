@@ -145,6 +145,9 @@ body {
   filter: blur(8px); /* Adjust the blur intensity as needed */
 }
 
+@media screen and (max-width: 768px) {
+  /* Mobile-specific styles go here */
+}
 
 
 
