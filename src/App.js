@@ -433,16 +433,16 @@ function App() {
   const calculateFontSize = () => {
     const combinedLength = skullDescription.length + quoteAuthor.length;
     const baseFontSize = 48; // Starting font size
-    const fontSizeDecreaseRate = 8; // Decrease rate per 50 characters
-    const minFontSize = 20; // Minimum font size you want
+    const maxFontSize = 28; // Maximum font size you want
+    const fontSizeDecreaseRate = 0.8; // Decrease rate per character
   
-    const fontSize = Math.max(
-      baseFontSize - Math.floor(combinedLength / 50) * fontSizeDecreaseRate,
-      minFontSize
-    );
+    // Calculate the font size based on the combined length
+    const fontSize = Math.max(baseFontSize - fontSizeDecreaseRate * combinedLength, maxFontSize);
   
     return `${fontSize}px`;
   };
+  
+  
   
 
 
