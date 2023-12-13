@@ -38,11 +38,14 @@ function App() {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // eslint-disable-next-line
   const [selectedCandleImage, setSelectedCandleImage] = useState(null);
   // eslint-disable-next-line
   const [selectedSkullImage, setSelectedSkullImage] = useState(null);
+  // eslint-disable-next-line
+  const [selectedTokenPrestigeStatus, setSelectedTokenPrestigeStatus] = useState("Undetermined");
 
   const getCandleImage = (tokenId) => {
     switch (tokenId) {
@@ -169,28 +172,33 @@ function App() {
     console.log("Skull clicked: ", formattedId);
     setSelectedSkullId(formattedId);
     setIsModalContentLoading(true);
-
+    setIsLoading(true);
+  
     try {
-      // eslint-disable-next-line
-        const [ownershipData, metadata] = await Promise.all([
-            checkTokenOwnership(formattedId),
-            fetchSkullMetadata(formattedId)
-        ]);
-
-        if (metadata) {
-            setSkullDescription(metadata.description);
-            setQuoteAuthor(metadata.quoteAuthor);
-            setMintedDate(formatDate(metadata.mintedDate));
-            setPrestigeStatus(metadata.prestigeStatus);
-        }
-        setIsModalOpen(true);
+        // eslint-disable-next-line
+      const [ownershipData, metadata] = await Promise.all([
+        checkTokenOwnership(formattedId),
+        fetchSkullMetadata(formattedId),
+      ]);
+  
+      if (metadata) {
+        setSkullDescription(metadata.description);
+        setQuoteAuthor(metadata.quoteAuthor);
+        setMintedDate(formatDate(metadata.mintedDate));
+        const prestige = metadata.prestigeStatus || "Undetermined"; // Default to "Undetermined"
+        setPrestigeStatus(prestige);
+        setSelectedTokenPrestigeStatus(prestige); // Set the selected token's prestige status
+      }
+      setIsModalOpen(true);
     } catch (error) {
-        console.error("Error fetching data for skull:", error);
-        // Handle error appropriately
+      console.error("Error fetching data for skull:", error);
     } finally {
-        setIsModalContentLoading(false);
+      setIsModalContentLoading(false);
+      setIsLoading(false);
     }
-};
+  };
+  
+  
 
 
   // #endregion
@@ -203,13 +211,8 @@ function App() {
       console.log(`Owner of the token: ${owner}`);
   
       if (owner.toLowerCase() === userAddress.toLowerCase()) {
-        if (prestigeStatus !== "Undetermined") {
-          setButtonText("Complete");
-          setButtonColor("gold");
-        } else {
-          setButtonText("Perform Ritual");
-          setButtonColor("red.500");
-        }
+        setButtonText("Select Skull"); // Always show "Select Skull" to the owner
+        setButtonColor("red.500");
       } else {
         const ensName = await getEnsName(owner);
         let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
@@ -225,6 +228,9 @@ function App() {
       console.error("Error checking token ownership:", error);
     }
   };
+  
+  
+  
 
 
   // #endregion
@@ -323,14 +329,16 @@ function App() {
                 {isModalContentLoading ? (
         <Spinner /> 
     ) : (
-                <Button
-    colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
-    mt="10px"
-    alignSelf={"center"}
-    onClick={handleButtonClick}
-  >
-    {buttonText}
-  </Button>)}
+      <Button
+      colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
+      mt="10px"
+      alignSelf={"center"}
+      onClick={handleButtonClick}
+      isLoading={isLoading} // Add isLoading prop here
+      loadingText="Loading..." // Optional loading text
+    >
+      {buttonText}
+    </Button>)}
               </ModalBody>
 
             </ModalContent>
