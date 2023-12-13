@@ -499,10 +499,7 @@ function App() {
   // #endregion
 
   return (
-    <div>
-      {isMobile ? (
-        <MobileVersion /> 
-      ) : (   
+  
     <ChakraProvider theme={theme}>
 
 <div className={isModalOpen ? "blur-background" : ""}>
@@ -552,8 +549,7 @@ function App() {
       </VStack>
       </div>
     </ChakraProvider>
-    )}
-    </div>
+
   );
 
 }
