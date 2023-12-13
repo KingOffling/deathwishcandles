@@ -9,7 +9,7 @@ import skullsABI from './skullsABI.json';
 import rareCandle from './images/candles/rare.png';
 import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
-import logo from './images/logo.png';v
+import logo from './images/logo.png';
 import MobileVersion from './MobileVersion'; 
 import './App.css';
 

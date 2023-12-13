@@ -5,10 +5,12 @@ import {
   Button,
 } from '@chakra-ui/react';
 
+import logo from './images/logo.png';
+
 function MobileVersion() {
   return (
     <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500">
-      <Image src="path_to_your_logo_image.png" width="200px" marginTop={"50px"} />
+      <Image src={logo} width="200px" marginTop={"50px"} />
       <Button
         colorScheme="red"
         onClick={() => {
