@@ -635,32 +635,41 @@ function App() {
   // #endregion
 
   // #region Live Updates / Effects
-  useEffect(() => {
-    const handleAccountsChanged = async (accounts) => {
-      setIsWalletConnected(accounts.length > 0);
-      const address = accounts[0] || '';
-      setUserAddress(address);
-      if (accounts.length > 0) {
-        setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
-        await queryCandles();
-        const ensName = await getEnsName(address);
-        setDisplayAddress(ensName || formatAddress(address));
-      } else {
-        setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
-        setDisplayAddress('');
-      }
-    };
 
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
+useEffect(() => {
+  const handleAccountsChanged = async (accounts) => {
+    setIsWalletConnected(accounts.length > 0);
+    const address = accounts[0] || '';
+    setUserAddress(address);
+
+    // Reset selected candle, skull, and main image when the wallet changes
+    setSelectedCandle(null);
+    setSelectedSkullId(null);
+    setMainImage(null);
+
+    if (accounts.length > 0) {
+      setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
+      await queryCandles();
+      const ensName = await getEnsName(address);
+      setDisplayAddress(ensName || formatAddress(address));
+    } else {
+      setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
+      setDisplayAddress('');
     }
+  };
 
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      }
-    };
-  }, [queryCandles, getEnsName]);
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+  }
+
+  return () => {
+    if (window.ethereum) {
+      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+    }
+  };
+}, [queryCandles, getEnsName]);
+
+
   // #endregion
 
   return (
