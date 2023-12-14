@@ -140,10 +140,6 @@ function App() {
         setButtonColor('yellow');
         return;
       }
-  
-      // If approval is granted for all candles, update the button
-      setButtonText('Perform Ritual');
-      setButtonColor('red');
     } catch (error) {
       console.error('Error checking approval:', error);
     }
@@ -196,11 +192,16 @@ function App() {
 
     return (
       <div>
-       {totalCandles > 0 && (
-  <Text color={selectedCandle && selectedSkullId ? "black" : "white"} fontSize="x-large" textAlign="center" mb="20px">
+{totalCandles > 0 ? (
+  <Text color={selectedCandle && selectedSkullId ? "black" : "white"} fontFamily="Rockledge" fontSize="x-large" textAlign="center" mb="20px">
     {selectedCandle && selectedSkullId ? "-" : "Select a Candle"}
   </Text>
+) : (
+  <Text color="#969696" fontFamily="Rockledge" fontSize="4xl" textAlign="center" mb="20px">
+    You Need A Candle<br />To Perform A Ritual
+  </Text>
 )}
+
 
         <div className="candle-container">
           {Object.entries(candleQuantities).flatMap(([tokenId, quantity]) =>
@@ -264,15 +265,49 @@ function App() {
   // #endregion
 
   // #region Token Ownership
+  const getPrestigeStatus = (prestigeNumber) => {
+    let buttonText = "";
+    let buttonColor = "";
+  
+    switch (prestigeNumber) {
+      case 1:
+        buttonText = "Prestige: Mythic";
+        buttonColor = "orange.500";
+        break;
+      case 2:
+        buttonText = "Prestige: Epic";
+        buttonColor = "purple.500";
+        break;
+      case 3:
+        buttonText = "Prestige: Rare";
+        buttonColor = "blue.500"
+        break;
+      case 4:
+        buttonText = "Prestige: Uncommon";
+        buttonColor = "green.500"
+        break;
+      default:
+        buttonText = "Select Skull";
+        buttonColor = "red.500";
+    }
+  
+    return { buttonText, buttonColor };
+  };
+  
+  
   const checkTokenOwnership = async (tokenId) => {
     try {
       console.log(`Checking ownership for token ID: ${tokenId}`);
       const owner = await skullsContract.ownerOf(tokenId);
       console.log(`Owner of the token: ${owner}`);
   
+      // Check if the ritual has been performed for the given token ID
+      const ritualResult = await deathwishRitualsContract.ritualPerformed(tokenId);
+  
       if (owner.toLowerCase() === userAddress.toLowerCase()) {
-        setButtonText("Select Skull"); // Always show "Select Skull" to the owner
-        setButtonColor("red.500");
+        const { buttonText, buttonColor } = getPrestigeStatus(ritualResult);
+        setButtonText(buttonText);
+        setButtonColor(buttonColor);
       } else {
         const ensName = await getEnsName(owner);
         let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
@@ -294,11 +329,6 @@ function App() {
   };
   
   
-  
-  
-  
-
-
   // #endregion
 
   // #region Skull Grid
@@ -611,6 +641,7 @@ function App() {
       const address = accounts[0] || '';
       setUserAddress(address);
       if (accounts.length > 0) {
+        setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
         await queryCandles();
         const ensName = await getEnsName(address);
         setDisplayAddress(ensName || formatAddress(address));
