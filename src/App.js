@@ -653,23 +653,24 @@ function App() {
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Define Prestige</Text>
         {MainImage && (
-  <Box
-    boxSize="400px"
-    border="3px solid white"
-    borderRadius="10px"
-    overflow="hidden"
-    transition="transform 0.2s, cursor 0.2s"
-    _hover={{
-      cursor: "pointer",
-      transform: "scale(1.05)",
-    }}
-  >
-    <Image
-      src={MainImage}
-      alt={`Selected Skull ${selectedSkullId}`}
-      boxSize="100%"
-    />
-  </Box>
+<Box
+  className={isLoading ? 'pulse' : ''}
+  boxSize="400px"
+  border="3px solid white"
+  borderRadius="10px"
+  overflow="hidden"
+  transition="transform 0.2s, cursor 0.2s"
+  _hover={{
+    cursor: "pointer",
+    transform: "scale(1.05)",
+  }}
+>
+  <Image
+    src={MainImage}
+    alt={`Selected Skull ${selectedSkullId}`}
+    boxSize="100%"
+  />
+</Box>
 )}
 
 

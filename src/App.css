@@ -143,3 +143,30 @@ body {
 @media screen and (max-width: 768px) {
   /* Mobile-specific styles go here */
 }
+
+/* Add these CSS classes to your App.css file */
+
+/* Animation for the main image */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Transition for button text and color */
+.button-transition {
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Add this CSS class to your App.css file */
+.button-transition.loading {
+  background-color: gray; /* Change background color when loading */
+  color: white; /* Change text color when loading */
+  cursor: not-allowed; /* Change cursor when loading */
+}
