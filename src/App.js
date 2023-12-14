@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Button, Text, VStack, ChakraProvider, extendTheme, Image, Spinner,
+  Button, Text, VStack, ChakraProvider, extendTheme, Image, Spinner, Box,
   Modal, HStack, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
@@ -10,6 +10,7 @@ import rareCandle from './images/candles/rare.png';
 import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
 import logo from './images/logo.png';
+import ritualABI from './ritualABI.json';
         // eslint-disable-next-line
 import MobileVersion from './MobileVersion'; 
 import './App.css';
@@ -59,10 +60,13 @@ function App() {
   // eslint-disable-next-line
   const [selectedCandleImage, setSelectedCandleImage] = useState(null);
   // eslint-disable-next-line
-  const [selectedSkullImage, setSelectedSkullImage] = useState(null);
-  // eslint-disable-next-line
+  const [MainImage, setMainImage] = useState(null);
+    // eslint-disable-next-line
+  const [ModalImage, setModalImage] = useState(null);
+    // eslint-disable-next-line
   const [selectedTokenPrestigeStatus, setSelectedTokenPrestigeStatus] = useState("Undetermined");
 
+  // eslint-disable-next-line
   const getCandleImage = (tokenId) => {
     switch (tokenId) {
       case 1: return rareCandle;
@@ -122,6 +126,40 @@ function App() {
   };
 
   // #endregion
+
+  // #region Approval Checks
+
+  const checkApproval = useCallback(async () => {
+    try {
+      const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e'; 
+      const isApproved = await candlesContract.isApprovedForAll(userAddress, spenderAddress);
+  
+      if (!isApproved) {
+        // If approval is not granted for any candle, update the button and return
+        setButtonText('Approve Candles');
+        setButtonColor('yellow');
+        return;
+      }
+  
+      // If approval is granted for all candles, update the button
+      setButtonText('Perform Ritual');
+      setButtonColor('red');
+    } catch (error) {
+      console.error('Error checking approval:', error);
+    }
+  }, [userAddress, candlesContract]);
+  
+  useEffect(() => {
+    if (isWalletConnected) {
+      checkApproval();
+    }
+  }, [isWalletConnected, selectedCandle, checkApproval]);
+  
+  
+  
+
+  // #endregion
+
 
   // #region Candles Orchestration
   const queryCandles = useCallback(async () => {
@@ -191,7 +229,7 @@ function App() {
     setIsLoading(true);
   
     try {
-        // eslint-disable-next-line
+          // eslint-disable-next-line
       const [ownershipData, metadata] = await Promise.all([
         checkTokenOwnership(formattedId),
         fetchSkullMetadata(formattedId),
@@ -204,6 +242,9 @@ function App() {
         const prestige = metadata.prestigeStatus || "Undetermined"; // Default to "Undetermined"
         setPrestigeStatus(prestige);
         setSelectedTokenPrestigeStatus(prestige); // Set the selected token's prestige status
+  
+        // Update the selected skull images based on context
+        setModalImage(`/images/skulls/DW365-${formattedId}.jpg`);
       }
       setIsModalOpen(true);
     } catch (error) {
@@ -213,6 +254,8 @@ function App() {
       setIsLoading(false);
     }
   };
+  
+  
   
   
 
@@ -234,16 +277,22 @@ function App() {
         let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
         setButtonText(
           <>
-            Owned by:<br />
-            {displayText}
+            Owned by: {displayText}
           </>
         );
         setButtonColor('black.500');
       }
     } catch (error) {
-      console.error("Error checking token ownership:", error);
+      if (error.message.includes("invalid token ID")) {
+        setButtonText("Not Yet Migrated");
+        setButtonColor("red");
+      } else {
+        console.error("Error checking token ownership:", error);
+      }
     }
   };
+  
+  
   
   
   
@@ -288,7 +337,7 @@ function App() {
         {selectedSkullId && (
           <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }}>
             {console.log('Rendering Modal...')}
-
+    
             <ModalOverlay />
             <ModalContent>
               <ModalHeader
@@ -302,11 +351,11 @@ function App() {
                   {prestigeStatus}
                 </Text>
               </ModalHeader>
-
+    
               <ModalBody display="flex" flexDirection="column" justifyContent="center" style={{ paddingBottom: '25px' }}>
                 <div className="image-overlay-container">
                   <Image
-                    src={`/images/skulls/DW365-${selectedSkullId}.jpg`}
+                    src={ModalImage} 
                     alt={`Skull ${selectedSkullId}`}
                     boxSize="400px"
                     border="2px solid black"
@@ -319,7 +368,7 @@ function App() {
                         overflowWrap: "break-word",
                         textAlign: "left",
                         padding: "10px",
-                        marginBottom: "auto", 
+                        marginBottom: "auto",
                       }}
                       className="description-text"
                     >
@@ -343,56 +392,134 @@ function App() {
                   {mintedDate}
                 </Text>
                 {isModalContentLoading ? (
-        <Spinner /> 
-    ) : (
-      <Button
-      colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
-      mt="10px"
-      alignSelf={"center"}
-      onClick={handleButtonClick}
-      isLoading={isLoading} // Add isLoading prop here
-      loadingText="Loading..." // Optional loading text
-    >
-      {buttonText}
-    </Button>)}
+                  <Spinner />
+                ) : (
+                  <Button
+                    colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
+                    mt="10px"
+                    alignSelf={"center"}
+                    onClick={handleButtonClick}
+                    isLoading={isLoading} // Add isLoading prop here
+                    loadingText="Loading..." // Optional loading text
+                  >
+                    {buttonText}
+                  </Button>)}
               </ModalBody>
-
+    
             </ModalContent>
           </Modal>
         )}
       </div>
     );
-  };
+                };
 
 
 
   //#endregion
 
   // #region Button Pushing
-
   const handleButtonClick = () => {
-    const skullIdNumber = parseInt(selectedSkullId, 10);
-    const url = `https://opensea.io/assets/ethereum/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${skullIdNumber}`;
-    window.open(url, '_blank');
+    if (buttonText === 'Not Yet Migrated') {
+      window.open('https://migrate.deathwishnft.io/', '_blank');
+    } else if (buttonText === 'Select Skull' && selectedSkullId) {
+      setMainImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
+      setIsModalOpen(false);
+    } else if (buttonText === 'Approve Candles') {
+      approveCandles();
+    } else {
+      const skullIdNumber = parseInt(selectedSkullId, 10);
+      const url = `https://opensea.io/assets/ethereum/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${skullIdNumber}`;
+      window.open(url, '_blank');
+    }
   };
+    
+  // #endregion
 
+  // #region Contract Approvals
+
+  const approveCandles = async () => {
+    try {
+      if (!window.ethereum || !window.ethereum.selectedAddress) {
+        showMessageModal('You must connect a wallet first.');
+        return;
+      }
+  
+      const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
+  
+      await candlesContract.methods.setApprovalForAll(spenderAddress, true).send({ from: window.ethereum.selectedAddress });
+
+      setButtonText('Perform Ritual');
+      setButtonColor('red');
+    } catch (error) {
+      console.error('Error approving candles:', error);
+      showMessageModal('There was an error approving the candles.');
+
+    }
+  };
+  
+  
+  
+  
 
   // #endregion
 
+
   // #region Perform Ritual
-  const performRitual = () => {
+
+  const deathwishRitualsContract = new ethers.Contract(
+    '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e', // Replace with the actual contract address
+    ritualABI,
+    provider // Use your existing Ethereum provider
+  );
+  
+
+  const performRitual = async () => {
     if (!selectedCandle || !selectedSkullId) {
       showMessageModal('Please select both a candle and a skull to continue.');
       return;
     }
-    if (selectedCandle && selectedSkullId) {
-      setSelectedCandleImage(getCandleImage(selectedCandle));
-      setSelectedSkullImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
-      setIsModalOpen(true);
-    } else {
-      alert('Please select both a candle and a skull to continue.');
+  
+    try {
+      // Check if the ritual is active
+      const isRitualActive = await deathwishRitualsContract.ritualActive();
+  
+      if (!isRitualActive) {
+        showMessageModal('Rituals are not currently permitted.');
+        return;
+      }
+  
+      // Get the signer
+      const signer = provider.getSigner();
+  
+      // Create a contract instance using the signer
+      const ritualsContract = new ethers.Contract(
+        '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e', // Replace with the actual contract address
+        ritualABI,
+        signer
+      );
+  
+      // Perform the ritual
+      const tx = await ritualsContract.performRitual(selectedSkullId, selectedCandle);
+      await tx.wait();
+  
+      // Transaction successful, you can display a success message or update your UI.
+      showMessageModal('Ritual successfully performed!');
+    } catch (error) {
+      console.error('Error performing ritual:', error);
+  
+      // Check if the error is due to a rejected transaction
+      if (error.code === 'ACTION_REJECTED') {
+        showMessageModal('User rejected the Ritual transaction.');
+      } else {
+        // Handle other errors and display an appropriate message.
+        showMessageModal('Failed to perform ritual. Please try again later.');
+      }
     }
   };
+  
+  
+  
+  
 
 
   // #endregion
@@ -525,6 +652,27 @@ function App() {
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Define Prestige</Text>
+        {MainImage && (
+  <Box
+    boxSize="400px"
+    border="3px solid white"
+    borderRadius="10px"
+    overflow="hidden"
+    transition="transform 0.2s, cursor 0.2s"
+    _hover={{
+      cursor: "pointer",
+      transform: "scale(1.05)",
+    }}
+  >
+    <Image
+      src={MainImage}
+      alt={`Selected Skull ${selectedSkullId}`}
+      boxSize="100%"
+    />
+  </Box>
+)}
+
+
         {isWalletConnected && <DisplayCandles />}
         <Button
   colorScheme="red"
