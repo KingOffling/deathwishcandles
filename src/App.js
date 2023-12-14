@@ -196,11 +196,12 @@ function App() {
 
     return (
       <div>
-        {totalCandles > 0 && (
-          <Text color="white" fontSize="x-large" textAlign="center" mb="20px">
-            {selectedCandle ? "Select a Skull" : "Select a Candle"}
-          </Text>
-        )}
+       {totalCandles > 0 && (
+  <Text color={selectedCandle && selectedSkullId ? "black" : "white"} fontSize="x-large" textAlign="center" mb="20px">
+    {selectedCandle && selectedSkullId ? "-" : "Select a Candle"}
+  </Text>
+)}
+
         <div className="candle-container">
           {Object.entries(candleQuantities).flatMap(([tokenId, quantity]) =>
             Array.from({ length: quantity }, (_, index) => (
@@ -424,6 +425,10 @@ function App() {
     } else if (buttonText === 'Select Skull' && selectedSkullId) {
       setMainImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
       setIsModalOpen(false);
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
     } else if (buttonText === 'Approve Candles') {
       approveCandles();
     } else {
