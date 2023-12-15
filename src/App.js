@@ -56,6 +56,7 @@ function App() {
   const [modalMessage, setModalMessage] = useState('');
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+    // eslint-disable-next-line
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
 
 
@@ -563,6 +564,7 @@ function App() {
 
   // #region Transaction Completion Effects
 
+    // eslint-disable-next-line
   const handleTransactionCompletion = () => {
     setIsTransactionConfirmed(true);
   };
