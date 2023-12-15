@@ -56,6 +56,8 @@ function App() {
   const [modalMessage, setModalMessage] = useState('');
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
+
 
   // eslint-disable-next-line
   const [selectedCandleImage, setSelectedCandleImage] = useState(null);
@@ -155,7 +157,6 @@ function App() {
   
 
   // #endregion
-
 
   // #region Candles Orchestration
   const queryCandles = useCallback(async () => {
@@ -364,9 +365,11 @@ function App() {
 
     return (
       <div>
-        <div className="scrolling-skulls-grid">{skulls}</div>
+        <div className={`scrolling-skulls-grid ${isLoading ? 'no-pointer' : ''}`}>
+          {skulls}
+        </div>
         {selectedSkullId && (
-          <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }}>
+          <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }}   transform={isMobile ? "scale(0.7)" : "none"}>
             {console.log('Rendering Modal...')}
     
             <ModalOverlay />
@@ -498,7 +501,6 @@ function App() {
 
   // #endregion
 
-
   // #region Perform Ritual
 
   const deathwishRitualsContract = new ethers.Contract(
@@ -556,6 +558,15 @@ function App() {
   
   
 
+
+  // #endregion
+
+  // #region Transaction Completion Effects
+
+  const handleTransactionCompletion = () => {
+    setIsTransactionConfirmed(true);
+  };
+  
 
   // #endregion
 
@@ -692,7 +703,7 @@ useEffect(() => {
         </ModalContent>
       </Modal>
 
-      <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500">
+      <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500" >
         <Image src={logo} width="400px" marginTop={"50px"} />
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
         <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>

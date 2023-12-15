@@ -170,3 +170,23 @@ body {
   color: white; /* Change text color when loading */
   cursor: not-allowed; /* Change cursor when loading */
 }
+
+@keyframes glowingEffect {
+  0% { box-shadow: 0 0 5px #fff; }
+  50% { box-shadow: 0 0 20px #fff; }
+  100% { box-shadow: 0 0 5px #fff; }
+}
+
+.glow-on-confirm {
+  animation: glowingEffect 2s infinite;
+}
+
+.no-pointer {
+  cursor: not-allowed;
+}
+
+.blur-when-busy {
+  filter: blur(5px);
+  opacity: 0.5;
+}
+
