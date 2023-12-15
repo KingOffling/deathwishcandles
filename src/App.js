@@ -11,8 +11,8 @@ import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
 import logo from './images/logo.png';
 import ritualABI from './ritualABI.json';
-        // eslint-disable-next-line
-import MobileVersion from './MobileVersion'; 
+// eslint-disable-next-line
+import MobileVersion from './MobileVersion';
 import './App.css';
 
 
@@ -25,7 +25,11 @@ const theme = extendTheme({
 });
 
 function App() {
-          // eslint-disable-next-line
+  // eslint-disable-next-line
+  const [TEST, setTEST] = useState(true);
+
+
+  // eslint-disable-next-line
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -38,7 +42,7 @@ function App() {
       window.removeEventListener('resize', checkIsMobile);
     };
   }, []);
-  
+
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
   const [candleQuantities, setCandleQuantities] = useState({ 1: 0, 2: 0, 3: 0 });
@@ -48,6 +52,7 @@ function App() {
   const [buttonColor, setButtonColor] = useState('black');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [displayAddress, setDisplayAddress] = useState('');
+  const [burningCandle, setBurningCandle] = useState(null);
   const [skullDescription, setSkullDescription] = useState('');
   const [quoteAuthor, setQuoteAuthor] = useState('');
   const [mintedDate, setMintedDate] = useState('');
@@ -56,7 +61,10 @@ function App() {
   const [modalMessage, setModalMessage] = useState('');
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-    // eslint-disable-next-line
+  const [mainImageClass, setMainImageClass] = useState('');
+  const [transactionStage, setTransactionStage] = useState(null);
+
+  // eslint-disable-next-line
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
 
 
@@ -64,9 +72,9 @@ function App() {
   const [selectedCandleImage, setSelectedCandleImage] = useState(null);
   // eslint-disable-next-line
   const [MainImage, setMainImage] = useState(null);
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const [ModalImage, setModalImage] = useState(null);
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const [selectedTokenPrestigeStatus, setSelectedTokenPrestigeStatus] = useState("Undetermined");
 
   // eslint-disable-next-line
@@ -134,9 +142,9 @@ function App() {
 
   const checkApproval = useCallback(async () => {
     try {
-      const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e'; 
+      const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
       const isApproved = await candlesContract.isApprovedForAll(userAddress, spenderAddress);
-  
+
       if (!isApproved) {
         // If approval is not granted for any candle, update the button and return
         setButtonText('Approve Candles');
@@ -147,15 +155,15 @@ function App() {
       console.error('Error checking approval:', error);
     }
   }, [userAddress, candlesContract]);
-  
+
   useEffect(() => {
     if (isWalletConnected) {
       checkApproval();
     }
   }, [isWalletConnected, selectedCandle, checkApproval]);
-  
-  
-  
+
+
+
 
   // #endregion
 
@@ -192,17 +200,24 @@ function App() {
 
     const totalCandles = Object.values(candleQuantities).reduce((acc, quantity) => acc + quantity, 0);
 
+    const getText = () => {
+      if (!isWalletConnected) return "-";
+      if (!MainImage) return "Select Skull";
+      if (!selectedCandle) return "Select Candle";
+      return "Perform Ritual";
+    };
+
     return (
       <div>
-{totalCandles > 0 ? (
-  <Text color={selectedCandle && selectedSkullId ? "black" : "white"} fontFamily="Rockledge" fontSize="x-large" textAlign="center" mb="20px">
-    {selectedCandle && selectedSkullId ? "-" : "Select a Candle"}
-  </Text>
-) : (
-  <Text color="#969696" fontFamily="Rockledge" fontSize="4xl" textAlign="center" mb="20px">
-    You Need A Candle<br />To Perform A Ritual
-  </Text>
-)}
+        {totalCandles > 0 ? (
+          <Text color={getText() === "-" ? "black" : "white"} fontFamily="Rockledge" fontSize="x-large" textAlign="center" mb="20px">
+            {getText()}
+          </Text>
+        ) : (
+          <Text color="#969696" fontFamily="Rockledge" fontSize="4xl" textAlign="center" mb="20px">
+            You Need A Candle<br />To Perform A Ritual
+          </Text>
+        )}
 
 
         <div className="candle-container">
@@ -212,9 +227,10 @@ function App() {
                 key={`${tokenId}-${index}`}
                 src={getCandleImage(parseInt(tokenId, 10))}
                 alt={`Candle ${tokenId}`}
-                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'}`}
+                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'} ${burningCandle === tokenId ? 'burning' : ''}`}
                 onClick={() => handleCandleClick(tokenId)}
               />
+
             ))
           )}
         </div>
@@ -231,14 +247,14 @@ function App() {
     setSelectedSkullId(formattedId);
     setIsModalContentLoading(true);
     setIsLoading(true);
-  
+
     try {
-          // eslint-disable-next-line
+      // eslint-disable-next-line
       const [ownershipData, metadata] = await Promise.all([
         checkTokenOwnership(formattedId),
         fetchSkullMetadata(formattedId),
       ]);
-  
+
       if (metadata) {
         setSkullDescription(metadata.description);
         setQuoteAuthor(metadata.quoteAuthor);
@@ -246,7 +262,7 @@ function App() {
         const prestige = metadata.prestigeStatus || "Undetermined"; // Default to "Undetermined"
         setPrestigeStatus(prestige);
         setSelectedTokenPrestigeStatus(prestige); // Set the selected token's prestige status
-  
+
         // Update the selected skull images based on context
         setModalImage(`/images/skulls/DW365-${formattedId}.jpg`);
       }
@@ -258,10 +274,10 @@ function App() {
       setIsLoading(false);
     }
   };
-  
-  
-  
-  
+
+
+
+
 
 
   // #endregion
@@ -270,7 +286,7 @@ function App() {
   const getPrestigeStatus = (prestigeNumber) => {
     let buttonText = "";
     let buttonColor = "";
-  
+
     switch (prestigeNumber) {
       case 1:
         buttonText = "Prestige: Mythic";
@@ -292,20 +308,20 @@ function App() {
         buttonText = "Select Skull";
         buttonColor = "red.500";
     }
-  
+
     return { buttonText, buttonColor };
   };
-  
-  
+
+
   const checkTokenOwnership = async (tokenId) => {
     try {
       console.log(`Checking ownership for token ID: ${tokenId}`);
       const owner = await skullsContract.ownerOf(tokenId);
       console.log(`Owner of the token: ${owner}`);
-  
+
       // Check if the ritual has been performed for the given token ID
       const ritualResult = await deathwishRitualsContract.ritualPerformed(tokenId);
-  
+
       if (owner.toLowerCase() === userAddress.toLowerCase()) {
         const { buttonText, buttonColor } = getPrestigeStatus(ritualResult);
         setButtonText(buttonText);
@@ -329,8 +345,8 @@ function App() {
       }
     }
   };
-  
-  
+
+
   // #endregion
 
   // #region Skull Grid
@@ -370,9 +386,9 @@ function App() {
           {skulls}
         </div>
         {selectedSkullId && (
-          <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }}   transform={isMobile ? "scale(0.7)" : "none"}>
+          <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setButtonText('Loading...'); setButtonColor('black'); }} transform={isMobile ? "scale(0.7)" : "none"}>
             {console.log('Rendering Modal...')}
-    
+
             <ModalOverlay />
             <ModalContent>
               <ModalHeader
@@ -386,11 +402,11 @@ function App() {
                   {prestigeStatus}
                 </Text>
               </ModalHeader>
-    
+
               <ModalBody display="flex" flexDirection="column" justifyContent="center" style={{ paddingBottom: '25px' }}>
                 <div className="image-overlay-container">
                   <Image
-                    src={ModalImage} 
+                    src={ModalImage}
                     alt={`Skull ${selectedSkullId}`}
                     boxSize="400px"
                     border="2px solid black"
@@ -440,13 +456,13 @@ function App() {
                     {buttonText}
                   </Button>)}
               </ModalBody>
-    
+
             </ModalContent>
           </Modal>
         )}
       </div>
     );
-                };
+  };
 
 
 
@@ -471,7 +487,7 @@ function App() {
       window.open(url, '_blank');
     }
   };
-    
+
   // #endregion
 
   // #region Contract Approvals
@@ -482,9 +498,9 @@ function App() {
         showMessageModal('You must connect a wallet first.');
         return;
       }
-  
+
       const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-  
+
       await candlesContract.methods.setApprovalForAll(spenderAddress, true).send({ from: window.ethereum.selectedAddress });
 
       setButtonText('Perform Ritual');
@@ -495,10 +511,10 @@ function App() {
 
     }
   };
-  
-  
-  
-  
+
+
+
+
 
   // #endregion
 
@@ -509,42 +525,42 @@ function App() {
     ritualABI,
     provider // Use your existing Ethereum provider
   );
-  
+
 
   const performRitual = async () => {
     if (!selectedCandle || !selectedSkullId) {
       showMessageModal('Please select both a candle and a skull to continue.');
       return;
     }
-  
+
     try {
       // Check if the ritual is active
       const isRitualActive = await deathwishRitualsContract.ritualActive();
-  
+
       if (!isRitualActive) {
         showMessageModal('Rituals are not currently permitted.');
         return;
       }
-  
+
       // Get the signer
       const signer = provider.getSigner();
-  
+
       // Create a contract instance using the signer
       const ritualsContract = new ethers.Contract(
         '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e', // Replace with the actual contract address
         ritualABI,
         signer
       );
-  
+
       // Perform the ritual
       const tx = await ritualsContract.performRitual(selectedSkullId, selectedCandle);
       await tx.wait();
-  
+
       // Transaction successful, you can display a success message or update your UI.
       showMessageModal('Ritual successfully performed!');
     } catch (error) {
       console.error('Error performing ritual:', error);
-  
+
       // Check if the error is due to a rejected transaction
       if (error.code === 'ACTION_REJECTED') {
         showMessageModal('User rejected the Ritual transaction.');
@@ -554,21 +570,44 @@ function App() {
       }
     }
   };
-  
-  
-  
-  
+
+
+
+
 
 
   // #endregion
 
   // #region Transaction Completion Effects
 
-    // eslint-disable-next-line
   const handleTransactionCompletion = () => {
     setIsTransactionConfirmed(true);
+    setTransactionStage('complete');
+
+    setBurningCandle(selectedCandle);
+
+    setTimeout(() => {
+      setBurningCandle(null);
+    }, 3000);
+  };
+
+  const simulateTransactionCompletion = () => {
+    setTransactionStage('loading');
+  
+    setTimeout(() => {
+      handleTransactionCompletion();
+    }, 5000);
   };
   
+  useEffect(() => {
+    if (transactionStage === 'loading') {
+      setMainImageClass("main-image-container loading");
+    } else if (transactionStage === 'complete') {
+      setMainImageClass("main-image-container complete pulse");
+    }
+  }, [transactionStage]);
+  
+
 
   // #endregion
 
@@ -578,7 +617,7 @@ function App() {
     setModalMessage(message);
     setIsMessageModalOpen(true);
   };
-  
+
 
   // #endregion
 
@@ -634,128 +673,139 @@ function App() {
     const baseFontSize = 48; // Starting font size
     const maxFontSize = 28; // Maximum font size you want
     const fontSizeDecreaseRate = 0.8; // Decrease rate per character
-  
+
     // Calculate the font size based on the combined length
     const fontSize = Math.max(baseFontSize - fontSizeDecreaseRate * combinedLength, maxFontSize);
-  
+
     return `${fontSize}px`;
   };
-  
-  
-  
+
+
+
 
 
   // #endregion
 
   // #region Live Updates / Effects
 
-useEffect(() => {
-  const handleAccountsChanged = async (accounts) => {
-    setIsWalletConnected(accounts.length > 0);
-    const address = accounts[0] || '';
-    setUserAddress(address);
+  useEffect(() => {
+    const handleAccountsChanged = async (accounts) => {
+      setIsWalletConnected(accounts.length > 0);
+      const address = accounts[0] || '';
+      setUserAddress(address);
 
-    // Reset selected candle, skull, and main image when the wallet changes
-    setSelectedCandle(null);
-    setSelectedSkullId(null);
-    setMainImage(null);
+      // Reset selected candle, skull, and main image when the wallet changes
+      setSelectedCandle(null);
+      setSelectedSkullId(null);
+      setMainImage(null);
 
-    if (accounts.length > 0) {
-      setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
-      await queryCandles();
-      const ensName = await getEnsName(address);
-      setDisplayAddress(ensName || formatAddress(address));
-    } else {
-      setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
-      setDisplayAddress('');
-    }
-  };
+      if (accounts.length > 0) {
+        setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
+        await queryCandles();
+        const ensName = await getEnsName(address);
+        setDisplayAddress(ensName || formatAddress(address));
+      } else {
+        setCandleQuantities({ 1: 0, 2: 0, 3: 0 });
+        setDisplayAddress('');
+      }
+    };
 
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', handleAccountsChanged);
-  }
-
-  return () => {
     if (window.ethereum) {
-      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
-  };
-}, [queryCandles, getEnsName]);
+
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      }
+    };
+  }, [queryCandles, getEnsName]);
 
 
   // #endregion
 
   return (
-  
+
     <ChakraProvider theme={theme}>
 
-<div className={isModalOpen ? "blur-background" : ""}>
-      <Modal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Ritual Update</ModalHeader>
-          <ModalBody>
-            <Text>{modalMessage}</Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={() => setIsMessageModalOpen(false)}>
-              Close
+      <div className={isModalOpen ? "blur-background" : ""}>
+        <Modal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Ritual Update</ModalHeader>
+            <ModalBody>
+              <Text>{modalMessage}</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={() => setIsMessageModalOpen(false)}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500" >
+          <Image src={logo} width="400px" marginTop={"50px"} />
+          <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
+          <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>
+          <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Define Prestige</Text>
+          {MainImage && (
+            <Box
+              className={mainImageClass}
+              boxSize="400px"
+              border="3px solid white"
+              borderRadius="10px"
+              overflow="hidden"
+              transition="transform 0.2s, cursor 0.2s"
+              _hover={{
+                cursor: "pointer",
+                transform: "scale(1.05)",
+              }}
+            >
+              <Image
+                src={MainImage}
+                alt={`Selected Skull ${selectedSkullId}`}
+                boxSize="100%"
+              />
+            </Box>
+          )}
+
+
+          {isWalletConnected && <DisplayCandles />}
+
+          {TEST && (
+            <Button
+              colorScheme="blue"
+              onClick={simulateTransactionCompletion}
+              m={4}
+            >
+              TEST Ritual
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          )}
 
-      <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500" >
-        <Image src={logo} width="400px" marginTop={"50px"} />
-        <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
-        <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>
-        <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Define Prestige</Text>
-        {MainImage && (
-<Box
-  className={isLoading ? 'pulse' : ''}
-  boxSize="400px"
-  border="3px solid white"
-  borderRadius="10px"
-  overflow="hidden"
-  transition="transform 0.2s, cursor 0.2s"
-  _hover={{
-    cursor: "pointer",
-    transform: "scale(1.05)",
-  }}
->
-  <Image
-    src={MainImage}
-    alt={`Selected Skull ${selectedSkullId}`}
-    boxSize="100%"
-  />
-</Box>
-)}
+          <Button
+            colorScheme="red"
+            onClick={!isWalletConnected ? connectWallet : performRitual}
+            m={4}
+          >
+            {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
+          </Button>
 
-
-        {isWalletConnected && <DisplayCandles />}
-        <Button
-  colorScheme="red"
-  onClick={!isWalletConnected ? connectWallet : performRitual}
-  m={4}
->
-  {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
-</Button>
-
-        {isWalletConnected ?
-          <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
-          <Text color="white" fontSize="small" opacity={0}>.</Text>
-        }
-        <ScrollingSkullsGrid
-          selectedSkullId={selectedSkullId}
-          setSelectedSkullId={setSelectedSkullId}
-          isModalOpen={isModalOpen}
-        />
-        <HStack spacing={4} m={"20px"}>
-          <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
-          <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
-          <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">Discord</a>
-        </HStack>
-      </VStack>
+          {isWalletConnected ?
+            <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
+            <Text color="white" fontSize="small" opacity={0}>.</Text>
+          }
+          <ScrollingSkullsGrid
+            selectedSkullId={selectedSkullId}
+            setSelectedSkullId={setSelectedSkullId}
+            isModalOpen={isModalOpen}
+          />
+          <HStack spacing={4} m={"20px"}>
+            <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
+            <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
+            <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">Discord</a>
+          </HStack>
+        </VStack>
       </div>
     </ChakraProvider>
 
