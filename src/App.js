@@ -553,20 +553,24 @@ function App() {
       );
 
       // Perform the ritual
+      setTransactionStage('loading');
       const tx = await ritualsContract.performRitual(selectedSkullId, selectedCandle);
       await tx.wait();
 
       // Transaction successful, you can display a success message or update your UI.
       showMessageModal('Ritual successfully performed!');
+      handleTransactionCompletion();
     } catch (error) {
       console.error('Error performing ritual:', error);
-
+      setTransactionStage('inert');
       // Check if the error is due to a rejected transaction
       if (error.code === 'ACTION_REJECTED') {
         showMessageModal('User rejected the Ritual transaction.');
+        setTransactionStage('inert');
       } else {
         // Handle other errors and display an appropriate message.
         showMessageModal('Failed to perform ritual. Please try again later.');
+        setTransactionStage('inert');
       }
     }
   };
@@ -605,6 +609,9 @@ function App() {
     } else if (transactionStage === 'complete') {
       setMainImageClass("main-image-container complete pulse");
     }
+   else if (transactionStage === 'inert') {
+    setMainImageClass("main-image-container inert");
+  }
   }, [transactionStage]);
   
 
