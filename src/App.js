@@ -89,6 +89,20 @@ function App() {
     }
   };
 
+  const resetState = () => {
+    setSelectedCandle(null);
+    setSelectedSkullId(null);
+    setIsLoading(false);
+    setMainImageClass('');
+    setTransactionStage(null);
+    setCanClickCandles(true);
+    setIsTransactionConfirmed(false);
+    setSelectedCandleImage(null);
+    setMainImage(null);
+    setModalImage(null);
+    setSelectedTokenPrestigeStatus("Undetermined");
+  };
+
 
   const readOnlyProvider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/edd1ef15a39f46a495d9441c6bdb9c45");
 
@@ -831,15 +845,17 @@ function App() {
             </Button>
           )}
 
-        <Button
-          colorScheme="red"
-          onClick={!isWalletConnected ? connectWallet : performRitual}
-          m={4}
-          isDisabled={!canClickCandles}
-          _disabled={{ cursor: 'not-allowed' }}
-        >
-          {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
-        </Button>
+      <Button
+        colorScheme={!isWalletConnected ? 'red' : isTransactionConfirmed ? 'yellow' : 'red'}
+        onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : performRitual}
+        m={4}
+        isDisabled={!canClickCandles && !isTransactionConfirmed}
+        _disabled={{ cursor: 'not-allowed' }}
+      >
+        {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : 'Perform Ritual'}
+      </Button>
+
+
 
 
           {isWalletConnected ?
