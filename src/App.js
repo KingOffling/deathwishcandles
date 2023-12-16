@@ -64,6 +64,7 @@ function App() {
   const [mainImageClass, setMainImageClass] = useState('');
   const [transactionStage, setTransactionStage] = useState(null);
   const [canClickCandles, setCanClickCandles] = useState(true);
+  const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
 
 
   // eslint-disable-next-line
@@ -100,7 +101,10 @@ function App() {
     setSelectedCandleImage(null);
     setMainImage(null);
     setModalImage(null);
+    setBurningCandle(null);
     setSelectedTokenPrestigeStatus("Undetermined");
+
+    queryCandles();
   };
 
 
@@ -199,7 +203,7 @@ function App() {
     queryCandles();
   }, [queryCandles]);
 
-
+  // eslint-disable-next-line
   const handleCandleClick = (tokenId) => {
     if (canClickCandles) {
       setSelectedCandle(tokenId);
@@ -216,7 +220,15 @@ function App() {
       }
     };
 
-    const totalCandles = Object.values(candleQuantities).reduce((acc, quantity) => acc + quantity, 0);
+    const handleCandleInteraction = (tokenId, quantity) => {
+      if (quantity > 0 && canClickCandles) {
+        setSelectedCandle(tokenId);
+      } else if (burningCandle) {
+
+      } else {
+        window.open(`https://opensea.io/assets/ethereum/0x521945fdcea1626e056e89a3abbdee709cf3a837/${tokenId}`, '_blank');
+      }
+    };
 
     const getText = () => {
       if (!isWalletConnected) return "-";
@@ -228,34 +240,40 @@ function App() {
 
     return (
       <div>
-        {totalCandles > 0 ? (
-          <Text color={getText() === "-" ? "black" : "white"} fontFamily="Rockledge" fontSize="x-large" textAlign="center" mb="20px">
-            {getText()}
-          </Text>
-        ) : (
-          <Text color="#969696" fontFamily="Rockledge" fontSize="4xl" textAlign="center" mb="20px">
-            You Need A Candle<br />To Perform A Ritual
-          </Text>
-        )}
+        <Text color="white" fontFamily="Rockledge" fontSize="x-large" textAlign="center" mb="20px">
+          {getText()}
+        </Text>
+
+        {
+          Object.values(candleQuantities).every(qty => qty === 0) &&
+          transactionStage !== 'complete' &&
+          !isTransactionConfirmed && (
+            <Text color="#969696" fontFamily="Rockledge" fontSize="4xl" textAlign="center" mb="20px">
+              You Need A Candle<br />To Perform A Ritual
+            </Text>
+          )
+        }
 
 
         <div className="candle-container">
-          {Object.entries(candleQuantities).flatMap(([tokenId, quantity]) =>
-            Array.from({ length: quantity }, (_, index) => (
+          {Object.entries(candleQuantities).map(([tokenId, quantity]) => (
+            <div key={tokenId} className="candle-item">
               <img
-                key={`${tokenId}-${index}`}
                 src={getCandleImage(parseInt(tokenId, 10))}
                 alt={`Candle ${tokenId}`}
-                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'} ${burningCandle === tokenId ? 'burning' : ''} ${!canClickCandles ? 'no-click' : ''}`}
-                onClick={canClickCandles ? () => handleCandleClick(tokenId) : undefined}
+                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'} ${burningCandle === tokenId ? 'burning' : ''} ${quantity === 0 ? 'low-quantity' : ''}`}
+                onClick={() => handleCandleInteraction(tokenId, quantity)}
               />
-            ))
-          )}
+              <Text color="white" fontFamily="Rockledge" fontSize="2xl">
+                {quantity}
+              </Text>
+            </div>
+          ))}
         </div>
-
       </div>
     );
   };
+
 
   //#endregion
 
@@ -465,17 +483,17 @@ function App() {
                   <Spinner />
                 ) : (
                   <Button
-                  colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
-                  mt="10px"
-                  alignSelf={"center"}
-                  onClick={handleButtonClick}
-                  isLoading={isLoading}
-                  loadingText="Loading..."
-                  isDisabled={!canClickCandles || isLoading}
-                  _disabled={{ cursor: 'not-allowed' }} 
-                >
-                  {buttonText}
-                </Button>
+                    colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
+                    mt="10px"
+                    alignSelf={"center"}
+                    onClick={handleButtonClick}
+                    isLoading={isLoading}
+                    loadingText="Loading..."
+                    isDisabled={!canClickCandles || isLoading}
+                    _disabled={{ cursor: 'not-allowed' }}
+                  >
+                    {buttonText}
+                  </Button>
                 )}
               </ModalBody>
 
@@ -493,7 +511,7 @@ function App() {
   // #region Button Pushing
 
   const handleButtonClick = () => {
-    if (canClickCandles){
+    if (canClickCandles) {
       if (buttonText === 'Not Yet Migrated') {
         window.open('https://migrate.deathwishnft.io/', '_blank');
       } else if (buttonText === 'Select Skull' && selectedSkullId) {
@@ -612,25 +630,21 @@ function App() {
   const handleTransactionCompletion = () => {
     setIsTransactionConfirmed(true);
     setTransactionStage('complete');
-
     setBurningCandle(selectedCandle);
-
-    setTimeout(() => {
-      setBurningCandle(null);
-    }, 3000);
+    setIsRitualCompleteModalOpen(true);
   };
 
   const simulateTransactionCompletion = () => {
     setTransactionStage('loading');
-  
+
     setTimeout(() => {
       handleTransactionCompletion();
     }, 3000);
   };
-  
+
   useEffect(() => {
     let className = "main-image-container";
-  
+
     if (transactionStage === 'loading') {
       className += " loading";
       setCanClickCandles(false);
@@ -666,11 +680,90 @@ function App() {
     console.log("Current className:", className);
 
     setMainImageClass(className);
-}, [transactionStage, selectedCandle]);
+  }, [transactionStage, selectedCandle]);
 
 
 
 
+  // #endregion
+
+  // #region Completion Modal (Twitter)
+
+
+  const handleBragClick = () => {
+    const candleTypes = {
+      1: 'Rare Candle',
+      2: 'Odd Candle',
+      3: 'Candle'
+    };
+    const tweetSkulls = {
+      1: 3,
+      2: 5,
+      3: 7 
+    };
+    const punchyComments = [
+      "The shadows whisper of newfound power.",
+      "In darkness, the ritual finds its strength.",
+      "A sinister glow heralds untold prestige.",
+      "The candle's flame unveils hidden truths.",
+      "Through the ritual, darkness turns to light.",
+      "Skulls aglow, the ancient secrets awaken.",
+      "Beneath the flickering candle, destiny is shaped.",
+      "With each flame, the skull's tale deepens.",
+      "In the heart of the fire, fate is forged.",
+      "Power surges where the candlelight dances.",
+      "Flames speak, and the skulls listen.",
+      "In the candle's core, mysteries unravel.",
+      "The skulls bear witness to the fire's might.",
+      "Each candle lit is a step towards greatness.",
+      "The dance of flames, a prelude to power.",
+      "Where shadows fall, the ritual thrives.",
+      "Candles blaze, revealing paths untrodden.",
+      "In the light of the flame, truth is revealed.",
+      "Skulls and candles, custodians of forbidden lore.",
+      "Each flicker, a whisper of ancient wisdom.",
+      "The ritual's call, a song of flame and bone.",
+      "Flame-lit skulls, beacons of eerie might.",
+      "In the candle's glow, destiny's threads intertwine.",
+      "Skulls agleam, echoing with power untold.",
+      "Where flames dance, the ritual's tale unfolds.",
+      "Candles kindle, and the skulls' secrets spill.",
+      "In the ritual's embrace, power finds form.",
+      "Flames rise, as do the fortunes of the bold.",
+      "The skulls' gaze pierces the veil of night.",
+      "Candles burn, forging legacies in their wake."
+    ];
+    
+    const getRandomComment = () => {
+      const randomIndex = Math.floor(Math.random() * punchyComments.length);
+      return punchyComments[randomIndex];
+    };
+
+    const candleType = candleTypes[selectedCandle];
+
+    const getSkulls = (candleTypeNumber) => {
+      const numberOfSkulls = tweetSkulls[candleTypeNumber] || 3; // Default to 3 if the type is not in the mapping
+      return '💀'.repeat(numberOfSkulls);
+    };
+
+    const getSkullImageUrl = (skullId) => {
+      const formattedSkullId = skullId.toString().padStart(3, '0');
+      return `https://dwritual.netlify.app/images/skulls/DW365-${formattedSkullId}.jpg`;
+    };
+
+    const skulls = getSkulls(selectedCandle);
+      // eslint-disable-next-line
+    const skullImageUrl = getSkullImageUrl(selectedSkullId);
+
+    const tweetContent = `🕯 A RITUAL HAS BEEN COMPLETED 🕯\n\n${skulls}\nThe ${candleType} has been lit\nDW365-${selectedSkullId} is now ${prestigeStatus}.\n${getRandomComment()}\n${skulls}\n\n#DeathWishRitual\n\nDo you have a DeathWish?\n@deathwishnft\ndeathwishnft.io\ndiscord.gg/deathwishnft`;
+
+    const encodedTweet = encodeURIComponent(tweetContent);
+    const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodedTweet}`;
+
+    window.open(twitterIntentUrl, '_blank');
+};
+  
+  
   // #endregion
 
   // #region Message Modal
@@ -789,8 +882,9 @@ function App() {
   return (
 
     <ChakraProvider theme={theme}>
-
       <div className={isModalOpen ? "blur-background" : ""}>
+
+        {/* General Message Modal */}
         <Modal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} isCentered>
           <ModalOverlay />
           <ModalContent>
@@ -805,6 +899,29 @@ function App() {
             </ModalFooter>
           </ModalContent>
         </Modal>
+
+        {selectedSkullId && (
+  <Modal isOpen={isRitualCompleteModalOpen} onClose={() => setIsRitualCompleteModalOpen(false)} isCentered>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader fontFamily="Rockledge, sans-serif" fontSize="3xl" textAlign="center">Ritual Complete</ModalHeader>
+      <ModalBody display="flex" flexDirection="column" alignItems="center">
+        <Image src={MainImage} alt={`Selected Skull ${selectedSkullId}`} boxSize="90%" className={mainImageClass} />
+        <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt={"10px"}>DW365-{selectedSkullId.padStart(3, '0')}</Text>
+        <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)}>
+          Prestige Status: {prestigeStatus}
+        </Text>
+      </ModalBody>
+      <ModalFooter justifyContent="center">
+        <Button colorScheme="blue" onClick={handleBragClick}>Brag</Button>
+        <Button colorScheme="red" ml={3} onClick={() => { setIsRitualCompleteModalOpen(false); window.scrollTo(0, 0); }}>Close</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+)}
+
+
+
 
         <VStack spacing={4} align="center" justify="center" minHeight="100vh" bgColor="black.500" >
           <Image src={logo} width="400px" marginTop={"50px"} />
@@ -845,15 +962,15 @@ function App() {
             </Button>
           )}
 
-      <Button
-        colorScheme={!isWalletConnected ? 'red' : isTransactionConfirmed ? 'yellow' : 'red'}
-        onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : performRitual}
-        m={4}
-        isDisabled={!canClickCandles && !isTransactionConfirmed}
-        _disabled={{ cursor: 'not-allowed' }}
-      >
-        {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : 'Perform Ritual'}
-      </Button>
+          <Button
+            colorScheme={!isWalletConnected ? 'red' : isTransactionConfirmed ? 'yellow' : 'red'}
+            onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : performRitual}
+            m={4}
+            isDisabled={!canClickCandles && !isTransactionConfirmed}
+            _disabled={{ cursor: 'not-allowed' }}
+          >
+            {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : 'Perform Ritual'}
+          </Button>
 
 
 
