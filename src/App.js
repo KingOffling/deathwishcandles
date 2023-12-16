@@ -63,6 +63,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [mainImageClass, setMainImageClass] = useState('');
   const [transactionStage, setTransactionStage] = useState(null);
+  const [canClickCandles, setCanClickCandles] = useState(true);
+
 
   // eslint-disable-next-line
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
@@ -185,7 +187,9 @@ function App() {
 
 
   const handleCandleClick = (tokenId) => {
-    setSelectedCandle(tokenId);
+    if (canClickCandles) {
+      setSelectedCandle(tokenId);
+    }
   };
 
   const DisplayCandles = () => {
@@ -204,6 +208,7 @@ function App() {
       if (!isWalletConnected) return "-";
       if (!MainImage) return "Select Skull";
       if (!selectedCandle) return "Select Candle";
+      if (isTransactionConfirmed) return "Ritual Complete";
       return "Perform Ritual";
     };
 
@@ -227,13 +232,13 @@ function App() {
                 key={`${tokenId}-${index}`}
                 src={getCandleImage(parseInt(tokenId, 10))}
                 alt={`Candle ${tokenId}`}
-                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'} ${burningCandle === tokenId ? 'burning' : ''}`}
-                onClick={() => handleCandleClick(tokenId)}
+                className={`candle-image ${selectedCandle === tokenId ? 'selected' : 'non-selected'} ${burningCandle === tokenId ? 'burning' : ''} ${!canClickCandles ? 'no-click' : ''}`}
+                onClick={canClickCandles ? () => handleCandleClick(tokenId) : undefined}
               />
-
             ))
           )}
         </div>
+
       </div>
     );
   };
@@ -360,8 +365,8 @@ function App() {
           key={i}
           src={`/images/skulls/DW365-${formattedId}.jpg`}
           alt={`Skull ${formattedId}`}
-          className="skull-image"
-          onClick={() => handleSkullClick(formattedId)}
+          className={`skull-image ${!canClickCandles ? 'no-click' : ''}`}
+          onClick={canClickCandles ? () => handleSkullClick(formattedId) : undefined}
         />
       );
     });
@@ -446,15 +451,18 @@ function App() {
                   <Spinner />
                 ) : (
                   <Button
-                    colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
-                    mt="10px"
-                    alignSelf={"center"}
-                    onClick={handleButtonClick}
-                    isLoading={isLoading} // Add isLoading prop here
-                    loadingText="Loading..." // Optional loading text
-                  >
-                    {buttonText}
-                  </Button>)}
+                  colorScheme={buttonColor === "gold" ? "yellow" : buttonColor === "red.500" ? "red" : "black"}
+                  mt="10px"
+                  alignSelf={"center"}
+                  onClick={handleButtonClick}
+                  isLoading={isLoading}
+                  loadingText="Loading..."
+                  isDisabled={!canClickCandles || isLoading}
+                  _disabled={{ cursor: 'not-allowed' }} 
+                >
+                  {buttonText}
+                </Button>
+                )}
               </ModalBody>
 
             </ModalContent>
@@ -469,22 +477,25 @@ function App() {
   //#endregion
 
   // #region Button Pushing
+
   const handleButtonClick = () => {
-    if (buttonText === 'Not Yet Migrated') {
-      window.open('https://migrate.deathwishnft.io/', '_blank');
-    } else if (buttonText === 'Select Skull' && selectedSkullId) {
-      setMainImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
-      setIsModalOpen(false);
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-    } else if (buttonText === 'Approve Candles') {
-      approveCandles();
-    } else {
-      const skullIdNumber = parseInt(selectedSkullId, 10);
-      const url = `https://opensea.io/assets/ethereum/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${skullIdNumber}`;
-      window.open(url, '_blank');
+    if (canClickCandles){
+      if (buttonText === 'Not Yet Migrated') {
+        window.open('https://migrate.deathwishnft.io/', '_blank');
+      } else if (buttonText === 'Select Skull' && selectedSkullId) {
+        setMainImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
+        setIsModalOpen(false);
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      } else if (buttonText === 'Approve Candles') {
+        approveCandles();
+      } else {
+        const skullIdNumber = parseInt(selectedSkullId, 10);
+        const url = `https://opensea.io/assets/ethereum/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${skullIdNumber}`;
+        window.open(url, '_blank');
+      }
     }
   };
 
@@ -600,20 +611,50 @@ function App() {
   
     setTimeout(() => {
       handleTransactionCompletion();
-    }, 5000);
+    }, 3000);
   };
   
   useEffect(() => {
-    if (transactionStage === 'loading') {
-      setMainImageClass("main-image-container loading");
-    } else if (transactionStage === 'complete') {
-      setMainImageClass("main-image-container complete pulse");
-    }
-   else if (transactionStage === 'inert') {
-    setMainImageClass("main-image-container inert");
-  }
-  }, [transactionStage]);
+    let className = "main-image-container";
   
+    if (transactionStage === 'loading') {
+      className += " loading";
+      setCanClickCandles(false);
+    } else if (transactionStage === 'complete') {
+      // Convert selectedCandle to an integer
+      const selectedCandleInt = parseInt(selectedCandle, 10);
+      console.log("Selected Candle:", selectedCandleInt);
+
+      switch (selectedCandleInt) {
+        case 1:
+          className += " mythic";
+          break;
+        case 2:
+          className += " epic";
+          break;
+        case 3:
+          className += " rare";
+          break;
+        case 4:
+          className += " uncommon";
+          break;
+        case 5:
+          className += " common";
+          break;
+        default:
+          className += " default-class";
+      }
+    } else if (transactionStage === 'inert') {
+      className += " inert";
+      setCanClickCandles(true);
+    }
+
+    console.log("Current className:", className);
+
+    setMainImageClass(className);
+}, [transactionStage, selectedCandle]);
+
+
 
 
   // #endregion
@@ -790,13 +831,16 @@ function App() {
             </Button>
           )}
 
-          <Button
-            colorScheme="red"
-            onClick={!isWalletConnected ? connectWallet : performRitual}
-            m={4}
-          >
-            {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
-          </Button>
+        <Button
+          colorScheme="red"
+          onClick={!isWalletConnected ? connectWallet : performRitual}
+          m={4}
+          isDisabled={!canClickCandles}
+          _disabled={{ cursor: 'not-allowed' }}
+        >
+          {!isWalletConnected ? 'Connect Wallet' : 'Perform Ritual'}
+        </Button>
+
 
           {isWalletConnected ?
             <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :

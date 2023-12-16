@@ -227,10 +227,6 @@ body {
   }
 }
 
-.main-image-container.complete {
-  animation: chromaticEffect 2s infinite alternate;
-}
-
 
 
 
@@ -273,19 +269,79 @@ body {
   }
 }
 
-@keyframes glowEffect {
+@keyframes glowMythic {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.7), 0 0 30px rgba(255, 140, 0, 0.5);
   }
   50% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 20px rgba(255, 165, 0, 1), 0 0 40px rgba(255, 165, 0, 0.8);
   }
 }
 
-.main-image-container.complete {
-  animation: floatEffect 3s infinite ease-in-out, glowEffect 4s infinite ease-in-out;
+@keyframes glowEpic {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(147, 0, 147, 0.7), 0 0 30px rgba(147, 0, 147, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(128, 0, 128, 1), 0 0 40px rgba(128, 0, 128, 0.8);
+  }
+}
+
+@keyframes glowRare {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 229, 229, 0.7), 0 0 30px rgba(0, 229, 229, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8);
+  }
+}
+
+@keyframes glowUncommon {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 102, 0, 0.7), 0 0 30px rgba(0, 102, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 128, 0, 1), 0 0 40px rgba(0, 128, 0, 0.8);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.main-image-container.mythic {
+  animation: floatEffect 3s infinite ease-in-out, glowMythic 4s infinite ease-in-out, sparkle 5s infinite alternate;
+}
+
+.main-image-container.epic {
+  animation: floatEffect 3s infinite ease-in-out, glowEpic 4s infinite ease-in-out, sparkle 5s infinite alternate;
+}
+
+.main-image-container.rare {
+  animation: floatEffect 3s infinite ease-in-out, glowRare 4s infinite ease-in-out, sparkle 5s infinite alternate;
+}
+
+.main-image-container.uncommon {
+  animation: floatEffect 3s infinite ease-in-out, glowUncommon 4s infinite ease-in-out, sparkle 5s infinite alternate;
+}
+
+.main-image-container.common {
+  animation: floatEffect 3s infinite ease-in-out, glowCommon 4s infinite ease-in-out;
 }
 
 
 
+.candle-image.no-click {
+  cursor: not-allowed;
+}
 
+.skull-image.no-click {
+  cursor: not-allowed;
+}
