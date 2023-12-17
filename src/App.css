@@ -405,4 +405,8 @@ body {
     height: 100%;
     object-fit: cover;
   }
+
+  .overlay-text {
+    display: none; 
+  }
 }

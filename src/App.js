@@ -517,6 +517,12 @@ function App() {
                     {buttonText}
                   </Button>
                 )}
+
+                {isMobile && (
+                        <Button colorScheme="red" onClick={() => setIsModalOpen(false)}>
+                          Close
+                        </Button>
+                      )}
               </ModalBody>
 
             </ModalContent>
