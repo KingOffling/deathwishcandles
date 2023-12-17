@@ -62,6 +62,7 @@ body {
   border: 2px solid white;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
+  object-fit: cover;
 }
 
 .candle-image:hover {
@@ -75,6 +76,18 @@ body {
 .candle-image.non-selected {
   filter: grayscale(100%);
 }
+
+.candle-image.no-click {
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .candle-image {
+    width: 80px;  /* Smaller size for mobile */
+    height: 80px; /* Smaller size for mobile */
+  }
+}
+
 
 .scrolling-skulls-grid {
   display: flex;
@@ -332,9 +345,6 @@ body {
 
 
 
-.candle-image.no-click {
-  cursor: not-allowed;
-}
 
 .skull-image.no-click {
   cursor: not-allowed;
