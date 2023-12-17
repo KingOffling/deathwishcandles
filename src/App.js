@@ -66,6 +66,8 @@ function App() {
   const [canClickCandles, setCanClickCandles] = useState(true);
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
   const [inputSkullId, setInputSkullId] = useState('');
+  const [inputEffect, setInputEffect] = useState('');
+
 
 
 
@@ -285,9 +287,10 @@ function App() {
     const id = parseInt(inputSkullId);
     if (id >= 1 && id <= 365) {
       handleSkullClick(String(id).padStart(3, '0'));
+      setInputEffect('');
     } else {
-      // Handle invalid input, such as showing an error message
-      alert('Invalid Skull ID. Please enter a number between 1 and 365.');
+      setInputEffect('shake-and-flash-animation');
+      setTimeout(() => setInputEffect(''), 500); // Remove class after animation
     }
   };
 
@@ -1040,27 +1043,33 @@ function App() {
             <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
             <Text color="white" fontSize="small" opacity={0}>.</Text>
           }
+
+
            {/* Input Field and Submit Button */}
-           <HStack alignSelf="flex-start" ml={5}>
-            <Text color="white" fontFamily="Rockledge" fontSize="2xl" letterSpacing="wider">DW365-</Text>
+           <HStack alignSelf="center" ml={5}>
+            <Text color="white" fontFamily="Rockledge" fontSize="2xl" letterSpacing="0.15em" mr={"-10px"}>DW365-</Text>
             <Input 
               value={inputSkullId}
               onChange={handleInputChange}
               placeholder="000"
-              size="sm"
+              size='md'
               maxLength={3}
-              width="80px"
+              width="58px"
+              className={inputEffect}
               style={{
                 color: 'white',
                 fontFamily: 'Rockledge',
                 borderColor: 'darkgrey',
                 backgroundColor: 'transparent',
-                fontSize: '20px' // Increased font size
+                fontSize: '2xl',
+                letterSpacing: '0.15em'
               }}
             />
             <Button 
               onClick={handleSkullIdSubmit}
               size="sm"
+              colorScheme="black"
+              outlineColor={"whiteAlpha.400"}
             >
               💀
             </Button>
