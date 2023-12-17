@@ -385,16 +385,12 @@ body {
 }
 
 .date-container {
-  text-align: left;
-  width: 400px; /* Match the width of the image */
-  margin: 10px 0; /* Add some spacing around the date text */
+  text-align: center;
+  width: 400px; 
 }
 
 
 @media (max-width: 768px) {
-  .date-container {
-    width: 60vw;
-  }
 
   .modal-content {
     width: 70%;
