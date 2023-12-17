@@ -519,7 +519,7 @@ function App() {
                 )}
 
                 {isMobile && (
-                        <Button colorScheme="red" onClick={() => setIsModalOpen(false)}>
+                        <Button className="close-button" colorScheme="red" onClick={() => setIsModalOpen(false)}>
                           Close
                         </Button>
                       )}

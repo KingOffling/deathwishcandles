@@ -409,4 +409,11 @@ body {
   .overlay-text {
     display: none; 
   }
+
+  .close-button {
+    width: auto; /* Adjust width to content */
+    padding-left: 10px; /* Small padding to the left */
+    padding-right: 10px; /* Small padding to the right */
+    margin-top: 10px; /* Space above the button */
+  }
 }
