@@ -378,3 +378,14 @@ body {
       height: auto;
   }
 }
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%; /* Adjust this to fit the mobile screen */
+    max-width: 100%; /* Ensure it doesn't exceed the screen width */
+  }
+
+  .image-overlay-container {
+    width: 100%; /* Make the container responsive */
+  }
+}
