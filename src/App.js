@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Button, Text, VStack, ChakraProvider, extendTheme, Image, Spinner, Box,
+  Button, Text, VStack, ChakraProvider, extendTheme, Image, Spinner, Box, Input,
   Modal, HStack, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
@@ -65,6 +65,8 @@ function App() {
   const [transactionStage, setTransactionStage] = useState(null);
   const [canClickCandles, setCanClickCandles] = useState(true);
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
+  const [inputSkullId, setInputSkullId] = useState('');
+
 
 
   // eslint-disable-next-line
@@ -276,6 +278,26 @@ function App() {
 
 
   //#endregion
+
+  // #region Skull Grid Searchbar
+
+  const handleSkullIdSubmit = () => {
+    const id = parseInt(inputSkullId);
+    if (id >= 1 && id <= 365) {
+      handleSkullClick(String(id).padStart(3, '0'));
+    } else {
+      // Handle invalid input, such as showing an error message
+      alert('Invalid Skull ID. Please enter a number between 1 and 365.');
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+    setInputSkullId(value);
+  };
+
+
+  // #endregion
 
   // #region Skull Grid Management
 
@@ -979,6 +1001,33 @@ function App() {
             <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
             <Text color="white" fontSize="small" opacity={0}>.</Text>
           }
+           {/* Input Field and Submit Button */}
+           <HStack alignSelf="flex-start" ml={5}>
+            <Text color="white" fontFamily="Rockledge" fontSize="2xl" letterSpacing="wider">DW365-</Text>
+            <Input 
+              value={inputSkullId}
+              onChange={handleInputChange}
+              placeholder="000"
+              size="sm"
+              maxLength={3}
+              width="80px"
+              style={{
+                color: 'white',
+                fontFamily: 'Rockledge',
+                borderColor: 'darkgrey',
+                backgroundColor: 'transparent',
+                fontSize: '20px' // Increased font size
+              }}
+            />
+            <Button 
+              onClick={handleSkullIdSubmit}
+              size="sm"
+            >
+              💀
+            </Button>
+          </HStack>
+
+          
           <ScrollingSkullsGrid
             selectedSkullId={selectedSkullId}
             setSelectedSkullId={setSelectedSkullId}
