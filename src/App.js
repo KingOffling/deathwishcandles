@@ -26,7 +26,7 @@ const theme = extendTheme({
 
 function App() {
   // eslint-disable-next-line
-  const [TEST, setTEST] = useState(true);
+  const [TEST, setTEST] = useState(false);
 
 
   // eslint-disable-next-line
@@ -1090,11 +1090,12 @@ function App() {
             setSelectedSkullId={setSelectedSkullId}
             isModalOpen={isModalOpen}
           />
-          <HStack spacing={4} m={"20px"}>
-            <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer">OpenSea</a>
-            <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer">Discord</a>
-          </HStack>
+        <HStack spacing={4} m={"20px"}>
+          <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Twitter</a>
+          <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>OpenSea</a>
+          <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Discord</a>
+        </HStack>
+
         </VStack>
       </div>
     </ChakraProvider>
