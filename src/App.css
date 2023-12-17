@@ -424,7 +424,7 @@ body {
   }
 
   .skull-image {
-    width: 18%; /* Set width to display 5 images per row */
-    margin: 1%; /* Optional: Add a small margin for spacing */
+    width: 16%;
+    margin: 1%;
   }
 }
