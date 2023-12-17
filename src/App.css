@@ -384,13 +384,12 @@ body {
   object-fit: cover;
 }
 
-.date-container {
-  text-align: center;
-  width: 400px; 
-}
-
 
 @media (max-width: 768px) {
+
+  .date-container {
+    text-align: center;
+  }
 
   .modal-content {
     width: 70%;
