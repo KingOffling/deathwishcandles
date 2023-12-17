@@ -470,33 +470,35 @@ function App() {
                     boxSize="400px"
                     border="2px solid black"
                   />
-                  <div className="overlay-text">
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: calculateFontSize(),
-                        overflowWrap: "break-word",
-                        textAlign: "left",
-                        padding: "10px",
-                        marginBottom: "auto",
-                      }}
-                      className="description-text"
-                    >
-                      {skullDescription}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: calculateFontSize(),
-                        overflowWrap: "break-word",
-                        textAlign: "right",
-                        padding: "10px"
-                      }}
-                      className="author-text"
-                    >
-                      {quoteAuthor}
-                    </Text>
-                  </div>
+                   {!isMobile && (
+                      <div className="overlay-text">
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: calculateFontSize(),
+                            overflowWrap: "break-word",
+                            textAlign: "left",
+                            padding: "10px",
+                            marginBottom: "auto",
+                          }}
+                          className="description-text"
+                        >
+                          {skullDescription}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: calculateFontSize(),
+                            overflowWrap: "break-word",
+                            textAlign: "right",
+                            padding: "10px"
+                          }}
+                          className="author-text"
+                        >
+                          {quoteAuthor}
+                        </Text>
+                      </div>
+                    )}
                 </div>
                 <div className="date-container">
                   <Text color="black" fontFamily={"Arial"} fontSize="12px">
