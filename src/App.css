@@ -394,6 +394,7 @@ body {
   .image-overlay-container {
     width: 60vw; /* Set width to 60% of viewport width */
     height: 60vw; /* Set height equal to the width to maintain aspect ratio */
+    margin: 0 auto; 
   }
 
   .image-overlay-container img {
