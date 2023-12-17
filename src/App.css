@@ -422,4 +422,9 @@ body {
     justify-content: center; /* Center horizontally */
     margin-top: 10px; /* Space above the container */
   }
+
+  .skull-image {
+    width: 18%; /* Set width to display 5 images per row */
+    margin: 1%; /* Optional: Add a small margin for spacing */
+  }
 }
