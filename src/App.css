@@ -392,9 +392,14 @@ body {
   }
 
   .image-overlay-container {
-    width: 100%; 
-    position: relative;
-    padding-top: 100%;
+    width: 60vw; /* Set width to 60% of viewport width */
+    height: 60vw; /* Set height equal to the width to maintain aspect ratio */
+  }
+
+  .image-overlay-container img {
+    width: 100%; /* Make image fill the container */
+    height: 100%; /* Maintain aspect ratio */
+    object-fit: cover; /* Ensure image covers the area without distortion */
   }
 
   .responsive-modal-image {
