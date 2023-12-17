@@ -11,8 +11,6 @@ import uncommonCandle from './images/candles/uncommon.png';
 import commonCandle from './images/candles/common.png';
 import logo from './images/logo.png';
 import ritualABI from './ritualABI.json';
-// eslint-disable-next-line
-import MobileVersion from './MobileVersion';
 import './App.css';
 
 
