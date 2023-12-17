@@ -46,6 +46,7 @@ function App() {
   const [candleQuantities, setCandleQuantities] = useState({ 1: 0, 2: 0, 3: 0 });
   const [selectedCandle, setSelectedCandle] = useState(null);
   const [selectedSkullId, setSelectedSkullId] = useState(null);
+  const [intendedSkullId, setIntendedSkullId] = useState(null);
   const [buttonText, setButtonText] = useState('Loading...');
   const [buttonColor, setButtonColor] = useState('black');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -551,6 +552,7 @@ function App() {
         window.open('https://migrate.deathwishnft.io/', '_blank');
       } else if (buttonText === 'Select Skull' && selectedSkullId) {
         setMainImage(`/images/skulls/DW365-${selectedSkullId}.jpg`);
+        setIntendedSkullId(selectedSkullId);
         setIsModalOpen(false);
         window.scrollTo({
           top: 0,
@@ -630,25 +632,22 @@ function App() {
         signer
       );
 
-      // Perform the ritual
       setTransactionStage('loading');
-      const tx = await ritualsContract.performRitual(selectedSkullId, selectedCandle);
+      const tx = await ritualsContract.performRitual(intendedSkullId, selectedCandle);
       await tx.wait();
 
-      // Transaction successful, you can display a success message or update your UI.
       showMessageModal('Ritual successfully performed!');
       handleTransactionCompletion();
     } catch (error) {
       console.error('Error performing ritual:', error);
       setTransactionStage('inert');
-      // Check if the error is due to a rejected transaction
+      
       if (error.code === 'ACTION_REJECTED') {
         showMessageModal('User rejected the Ritual transaction.');
-        setTransactionStage('inert');
+      } else if (error.message.includes('execution reverted: You must own the DW365 token')) {
+        showMessageModal(`Ritual failed: You must own the DW365 token.\n\nSelected Skull ID: ${selectedSkullId}\nIntended Skull ID: ${intendedSkullId}`);
       } else {
-        // Handle other errors and display an appropriate message.
         showMessageModal('Failed to perform ritual. Please try again later.');
-        setTransactionStage('inert');
       }
     }
   };
