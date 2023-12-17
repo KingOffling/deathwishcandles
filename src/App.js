@@ -66,7 +66,6 @@ function App() {
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
   const [inputSkullId, setInputSkullId] = useState('');
   const [inputEffect, setInputEffect] = useState('');
-  const [loadingStates, setLoadingStates] = useState({});
 
 
 
@@ -127,10 +126,6 @@ function App() {
     skullsABI,
     readOnlyProvider
   );
-
-  const handleImageLoad = (id) => {
-    setLoadingStates(prev => ({ ...prev, [id]: false }));
-  };
 
 
   // #region Wallet Connectivity
@@ -421,28 +416,14 @@ function App() {
 
     const skulls = Array.from({ length: 365 }, (_, i) => {
       const formattedId = String(i + 1).padStart(3, '0');
-      
-      if (loadingStates[formattedId] === undefined) {
-        setLoadingStates(prev => ({ ...prev, [formattedId]: true }));
-      }
-  
       return (
-        <Box key={i} position="relative" width="100px" height="100px">
-          {loadingStates[formattedId] ? (
-            <VStack>
-              <Spinner />
-              <Text>DW365-{formattedId}</Text>
-            </VStack>
-          ) : null}
-          <img
-            src={`/images/skulls/DW365-${formattedId}.jpg`}
-            alt={`Skull ${formattedId}`}
-            className={`skull-image ${!canClickCandles ? 'no-click' : ''}`}
-            onClick={canClickCandles ? () => handleSkullClick(formattedId) : undefined}
-            onLoad={() => handleImageLoad(formattedId)}
-            style={{ display: loadingStates[formattedId] ? 'none' : 'block' }}
-          />
-        </Box>
+        <img
+          key={i}
+          src={`/images/skulls/DW365-${formattedId}.jpg`}
+          alt={`Skull ${formattedId}`}
+          className={`skull-image ${!canClickCandles ? 'no-click' : ''}`}
+          onClick={canClickCandles ? () => handleSkullClick(formattedId) : undefined}
+        />
       );
     });
 
