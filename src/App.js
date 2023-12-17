@@ -723,38 +723,62 @@ function App() {
       2: 5,
       3: 7 
     };
+    
+    
     const punchyComments = [
-      "The shadows whisper of newfound power.",
-      "In darkness, the ritual finds its strength.",
-      "A sinister glow heralds untold prestige.",
-      "The candle's flame unveils hidden truths.",
-      "Through the ritual, darkness turns to light.",
-      "Skulls aglow, the ancient secrets awaken.",
-      "Beneath the flickering candle, destiny is shaped.",
-      "With each flame, the skull's tale deepens.",
-      "In the heart of the fire, fate is forged.",
-      "Power surges where the candlelight dances.",
-      "Flames speak, and the skulls listen.",
-      "In the candle's core, mysteries unravel.",
-      "The skulls bear witness to the fire's might.",
-      "Each candle lit is a step towards greatness.",
-      "The dance of flames, a prelude to power.",
-      "Where shadows fall, the ritual thrives.",
-      "Candles blaze, revealing paths untrodden.",
-      "In the light of the flame, truth is revealed.",
-      "Skulls and candles, custodians of forbidden lore.",
-      "Each flicker, a whisper of ancient wisdom.",
-      "The ritual's call, a song of flame and bone.",
-      "Flame-lit skulls, beacons of eerie might.",
-      "In the candle's glow, destiny's threads intertwine.",
-      "Skulls agleam, echoing with power untold.",
-      "Where flames dance, the ritual's tale unfolds.",
-      "Candles kindle, and the skulls' secrets spill.",
-      "In the ritual's embrace, power finds form.",
-      "Flames rise, as do the fortunes of the bold.",
-      "The skulls' gaze pierces the veil of night.",
-      "Candles burn, forging legacies in their wake."
-    ];
+      "In the flicker of defiance, our shadows dance with fire.",
+      "Candles aren't just for praying, they're for proclaiming power.",
+      'Skulls grin in the candlelight, mocking mortality.',
+      'Each flame a tiny rebellion, each skull a testament to defiance.',
+      "In the ritual's heart, we find our wildest truths.",
+      "Where candles burn, the world's rules blur and bend.",
+      'The skulls know things – whispered in flames, secrets of the untamed.',
+      'Every candle is a small anarchy, a spark of the unyielding.',
+      "In the skull's empty gaze, we see our raw potential.",
+      "Flames don't just light the dark, they ignite our rebel spirits.",
+      "In the dance of fire and bone, there's a story untold, uncontrolled.",
+      "The candle's glow, a beacon for the brave and the bold.",
+      "Skulls aren't silent; listen close, they speak in fire's tongue.",
+      'Each candlelit is a step off the beaten path, into the wild unknown.',
+      "In the ritual's embrace, we find the courage to defy.",
+      'Skulls and candles, our relics of rebellion, our icons of the irreverent.',
+      'In the heart of the flame, we find our untamed, unapologetic selves.',
+      "Where fire meets bone, there's a power unowned and unknown.",
+      "In the ritual's light, we're not just alive – we're alight.",
+      'Candles flicker like punk rock anthems, skulls our mosh pit.',
+      "The candle's flame, a small riot in the night, a spark of the insurgent.",
+      "With each skull's stare, we're dared to be different, to dissent.",
+      "In the ritual's resonance, we find the rhythm of the rebels.",
+      'Skulls aglow, not with fear, but with the fire of the fearless.',
+      "The candle's flame, a whispered rebellion against the night.",
+      "In the ritual's heart, chaos finds its order.",
+      'Candles flicker, taunting the shadows with secrets untold.',
+      'Each skull, a testament to defiant truths.',
+      "The flame's embrace, a dance with destiny's wild side.",
+      "Darkness and light, the skull's eternal revelry.",
+      'Where the candle burns, the mundane shatters.',
+      "Power, not for the faint-hearted, thrives in the ritual's depths.",
+      'Skulls, not silent, echo with tales of the damned and the daring.',
+      "In the inferno's heart, destiny’s rogue waves are born.",
+      'Rebellion kindled, each flame a beacon of the unbound spirit.',
+      'Skulls, candles, and midnight whispers – the triad of the untamed.',
+      "Where the candle's light pierces, shadows bow in awe.",
+      'Each skull, a defiant guardian of the flame’s untold stories.',
+      "Candles, not just burning, but igniting souls' wildest dreams.",
+      "In the skull's hollow, echoes of liberty resonate.",
+      'Rituals, not for the meek, but for the bold seekers of the abyss.',
+      "Flames, the skull's silent conspirators in the dance of defiance.",
+      "Each flicker, a challenge to the world's forgotten corners.",
+      'Where skulls gaze, the veils of reality tremble.',
+      "Candles, the skull's partners in the waltz against conformity.",
+      'Rituals, not just acts, but declarations of untamed power.',
+      "In the candle's glow, the world's hypocrisy stands naked.",
+      'Skulls, not mere bone, but thrones of rebel souls.',
+      'Where the fire rages, the truth’s raw face emerges.',
+      "In the ritual's embrace, the world's facade crumbles."
+  ];
+  
+    
     
     const getRandomComment = () => {
       const randomIndex = Math.floor(Math.random() * punchyComments.length);
@@ -764,7 +788,7 @@ function App() {
     const candleType = candleTypes[selectedCandle];
 
     const getSkulls = (candleTypeNumber) => {
-      const numberOfSkulls = tweetSkulls[candleTypeNumber] || 3; // Default to 3 if the type is not in the mapping
+      const numberOfSkulls = tweetSkulls[candleTypeNumber] || 3;
       return '💀'.repeat(numberOfSkulls);
     };
 
@@ -922,13 +946,16 @@ function App() {
           </ModalContent>
         </Modal>
 
+
+
+        {/* Ritual Complete Modal */}
         {selectedSkullId && (
   <Modal isOpen={isRitualCompleteModalOpen} onClose={() => setIsRitualCompleteModalOpen(false)} isCentered>
     <ModalOverlay />
     <ModalContent>
       <ModalHeader fontFamily="Rockledge, sans-serif" fontSize="3xl" textAlign="center">Ritual Complete</ModalHeader>
       <ModalBody display="flex" flexDirection="column" alignItems="center">
-        <Image src={MainImage} alt={`Selected Skull ${selectedSkullId}`} boxSize="90%" className={mainImageClass} />
+        <Image src={MainImage} alt={`Selected Skull ${selectedSkullId}`} boxSize="90%" className={`${mainImageClass} responsive-modal-image`} />
         <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt={"10px"}>DW365-{selectedSkullId.padStart(3, '0')}</Text>
         <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)}>
           Prestige Status: {prestigeStatus}

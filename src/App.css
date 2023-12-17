@@ -196,10 +196,9 @@ body {
   100% {
     transform: scale(0.95);
     filter: brightness(60%) contrast(150%) sepia(1) saturate(700%) hue-rotate(15deg);
-    opacity: 0;
+    opacity: 0.2; /* Adjusted to match .low-quantity opacity */
   }
 }
-
 
 @keyframes smokeEffect {
   0%, 100% {
@@ -213,12 +212,13 @@ body {
 }
 
 .burning {
-  animation: burnFlame 3s forwards
+  animation: burnFlame 3s forwards;
 }
 
 .low-quantity {
   opacity: 0.2;
 }
+
 
 
 
@@ -351,4 +351,20 @@ body {
 
 .ritual-complete-modal img {
   /* Additional styles if needed */
+}
+
+.modal-image {
+  /* Your existing styles */
+}
+
+.responsive-modal-image {
+  max-width: 80%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .responsive-modal-image {
+      max-width: 80%;
+      height: auto;
+  }
 }
