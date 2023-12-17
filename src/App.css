@@ -416,4 +416,10 @@ body {
     padding-right: 10px;
     margin-top: 10px; 
   }
+
+  .close-button-container {
+    display: flex; /* Use flexbox */
+    justify-content: center; /* Center horizontally */
+    margin-top: 10px; /* Space above the container */
+  }
 }

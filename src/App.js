@@ -519,9 +519,11 @@ function App() {
                 )}
 
                 {isMobile && (
-                        <Button className="close-button" colorScheme="red" onClick={() => setIsModalOpen(false)}>
-                          Close
-                        </Button>
+                        <div className="close-button-container">
+                          <Button className="close-button" colorScheme="red" onClick={() => setIsModalOpen(false)}>
+                            Close
+                          </Button>
+                        </div>
                       )}
               </ModalBody>
 
