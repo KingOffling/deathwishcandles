@@ -498,9 +498,11 @@ function App() {
                     </Text>
                   </div>
                 </div>
-                <Text color="black" fontFamily={"Arial"} fontSize="12px">
-                  {mintedDate}
-                </Text>
+                <div className="date-container">
+                  <Text color="black" fontFamily={"Arial"} fontSize="12px">
+                    {mintedDate}
+                  </Text>
+                </div>
                 {isModalContentLoading ? (
                   <Spinner />
                 ) : (
