@@ -969,20 +969,29 @@ function App() {
     <ModalOverlay />
     <ModalContent>
       <ModalHeader fontFamily="Rockledge, sans-serif" fontSize="3xl" textAlign="center">Ritual Complete</ModalHeader>
-      <ModalBody display="flex" flexDirection="column" alignItems="center">
-        <Image src={MainImage} alt={`Selected Skull ${selectedSkullId}`} boxSize="90%" className={`${mainImageClass} responsive-modal-image`} />
-        <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt={"10px"}>DW365-{selectedSkullId.padStart(3, '0')}</Text>
-        <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)}>
+      <ModalBody display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+        <Image 
+          src={MainImage} 
+          alt={`Selected Skull ${selectedSkullId}`} 
+          boxSize={{ base: "60%", md: "90%" }} 
+          className={`${mainImageClass} ritual-complete-image`}
+          style={{ aspectRatio: '1 / 1' }} 
+        />
+        <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt="10px">DW365-{selectedSkullId.padStart(3, '0')}</Text>
+        <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)} mt="5px">
           Prestige Status: {prestigeStatus}
         </Text>
       </ModalBody>
       <ModalFooter justifyContent="center">
         <Button colorScheme="blue" onClick={handleBragClick}>Brag</Button>
-        <Button colorScheme="red" ml={3} onClick={() => { setIsRitualCompleteModalOpen(false); window.scrollTo(0, 0); }}>Close</Button>
+        {isMobile && (
+          <Button colorScheme="red" ml={3} onClick={() => setIsRitualCompleteModalOpen(false)}>Close</Button>
+        )}
       </ModalFooter>
     </ModalContent>
   </Modal>
 )}
+
 
 
 
