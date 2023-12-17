@@ -976,7 +976,7 @@ function App() {
           <Image src={logo} width="400px" marginTop={"50px"} />
           <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Light Your Candle</Text>
           <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"-1em"} opacity={1}>Complete the ritual</Text>
-          //<Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Unlock Your Prestige</Text>
+          <Text color="white" fontFamily={"Rockledge"} fontSize="2em" mb={"1em"} opacity={1}>Unlock Your Prestige</Text>
           {MainImage && (
             <Box
               className={mainImageClass}
