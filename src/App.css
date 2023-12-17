@@ -384,21 +384,25 @@ body {
   object-fit: cover;
 }
 
-
-@media (max-width: 768px) {
-  .responsive-modal-image {
-      max-width: 80%;
-      height: auto;
-  }
-}
-
 @media (max-width: 768px) {
   .modal-content {
-    width: 90%; /* Adjust this to fit the mobile screen */
-    max-width: 100%; /* Ensure it doesn't exceed the screen width */
+    width: 70%;
+    max-width: 90%;
+    margin: auto;
   }
 
   .image-overlay-container {
-    width: 100%; /* Make the container responsive */
+    width: 100%; 
+    position: relative;
+    padding-top: 100%;
+  }
+
+  .responsive-modal-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }

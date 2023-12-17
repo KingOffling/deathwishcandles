@@ -390,7 +390,7 @@ function App() {
         let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
         setButtonText(
           <>
-            Owned by: {displayText}
+            Owned by:<br/>{displayText}
           </>
         );
         setButtonColor('black.500');
