@@ -163,44 +163,6 @@ function App() {
 
   // #endregion
 
-  // #region Approval Checks
-
-  const checkApproval = useCallback(async () => {
-    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-    try {
-      return await candlesContract.isApprovedForAll(userAddress, spenderAddress);
-    } catch (error) {
-      console.error('Error checking approval:', error);
-      showMessageModal('There was an issue checking the approval status. Please try again.');
-      return false;
-    }
-  }, [userAddress, candlesContract, showMessageModal]); // Ensure showMessageModal is included if used
-
-
-  const requestApproval = async () => {
-    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-    try {
-      await candlesContract.setApprovalForAll(spenderAddress, true);
-      showMessageModal('Approval request submitted. Please confirm the transaction in your wallet.');
-    } catch (error) {
-      console.error('Error requesting approval:', error);
-      showMessageModal('There was an issue requesting approval. Please try again.');
-    }
-  };
-
-
-
-
-  useEffect(() => {
-    if (isWalletConnected) {
-      checkApproval();
-    }
-  }, [isWalletConnected, selectedCandle, checkApproval]);
-
-
-
-
-  // #endregion
 
   // #region Candles Orchestration
   const queryCandles = useCallback(async () => {
@@ -867,11 +829,11 @@ function App() {
 
   // #region Message Modal
 
-  const showMessageModal = (message) => {
+  const showMessageModal = useCallback((message) => {
     setModalMessage(message);
     setIsMessageModalOpen(true);
-  };
-
+  }, [setModalMessage, setIsMessageModalOpen]);
+  
 
   // #endregion
 
@@ -939,6 +901,46 @@ function App() {
 
 
   // #endregion
+
+  // #region Approval Checks
+
+  const checkApproval = useCallback(async () => {
+    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
+    try {
+      return await candlesContract.isApprovedForAll(userAddress, spenderAddress);
+    } catch (error) {
+      console.error('Error checking approval:', error);
+      showMessageModal('There was an issue checking the approval status. Please try again.');
+      return false;
+    }
+  }, [userAddress, candlesContract, showMessageModal]); 
+
+
+  const requestApproval = async () => {
+    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
+    try {
+      await candlesContract.setApprovalForAll(spenderAddress, true);
+      showMessageModal('Approval request submitted. Please confirm the transaction in your wallet.');
+    } catch (error) {
+      console.error('Error requesting approval:', error);
+      showMessageModal('There was an issue requesting approval. Please try again.');
+    }
+  };
+
+
+
+
+  useEffect(() => {
+    if (isWalletConnected) {
+      checkApproval();
+    }
+  }, [isWalletConnected, selectedCandle, checkApproval]);
+
+
+
+
+  // #endregion
+
 
   // #region Live Updates / Effects
 
