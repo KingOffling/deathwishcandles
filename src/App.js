@@ -568,8 +568,19 @@ function App() {
       }
   
       const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
+
+      const isAlreadyApproved = await candlesContract.isApprovedForAll(userAddress, spenderAddress);
+      if (isAlreadyApproved) {
+        showMessageModal('Candle transfers are already approved.');
+        setIsCandleTransferApproved(true); 
+        return;
+      }
+
       const transaction = await candlesContract.setApprovalForAll(spenderAddress, true);
-      await transaction.wait(); // Wait for the transaction to be mined
+      await transaction.wait(); 
+
+      const isNowApproved = await checkApproval();
+      setIsCandleTransferApproved(isNowApproved);
   
       setButtonText('Perform Ritual');
       setButtonColor('red');
