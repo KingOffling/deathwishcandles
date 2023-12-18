@@ -149,9 +149,6 @@ function App() {
         const ensName = await getEnsName(address);
         setDisplayAddress(ensName || formatAddress(address));
   
-        const approvalStatus = await checkApproval();
-        setIsCandleTransferApproved(approvalStatus);
-  
       } else {
         console.error('No address returned from wallet');
       }
@@ -620,13 +617,6 @@ function App() {
     }
   };
   
-  
-  
-
-
-
-
-
   // #endregion
 
   // #region Perform Ritual
@@ -647,7 +637,7 @@ function App() {
     try {
       const isApproved = await checkApproval();
       if (!isApproved) {
-        await requestApproval();
+        await approveCandles();
         return;
       }
 
@@ -963,40 +953,6 @@ function App() {
       return false;
     }
   }, [userAddress, candlesContract, showMessageModal]); 
-
-
-  const requestApproval = async () => {
-    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-    try {
-      await candlesContract.setApprovalForAll(spenderAddress, true);
-      showMessageModal('Approval request submitted. Please confirm the transaction in your wallet.');
-    } catch (error) {
-      console.error('Error requesting approval:', error);
-      showMessageModal('There was an issue requesting approval. Please try again.');
-    }
-  };
-
-
-  useEffect(() => {
-    const checkAndSetApproval = async () => {
-      if (isWalletConnected) {
-        const approvalStatus = await checkApproval();
-        setIsCandleTransferApproved(approvalStatus);
-      }
-    };
-  
-    checkAndSetApproval();
-  }, [isWalletConnected, checkApproval]);
-  
-
-  useEffect(() => {
-    if (isWalletConnected) {
-      checkApproval();
-    }
-  }, [isWalletConnected, selectedCandle, checkApproval]);
-
-
-
 
   // #endregion
 
