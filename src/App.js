@@ -66,6 +66,7 @@ function App() {
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
   const [inputSkullId, setInputSkullId] = useState('');
   const [inputEffect, setInputEffect] = useState('');
+  const [isCandleTransferApproved, setIsCandleTransferApproved] = useState(false);
 
 
 
@@ -167,10 +168,10 @@ function App() {
     try {
       const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
       const isApproved = await candlesContract.isApprovedForAll(userAddress, spenderAddress);
-
+      setIsCandleTransferApproved(isApproved);
+  
       if (!isApproved) {
-        // If approval is not granted for any candle, update the button and return
-        setButtonText('Approve Candles');
+        setButtonText('Approve Transfer');
         setButtonColor('yellow');
         return;
       }
@@ -178,6 +179,7 @@ function App() {
       console.error('Error checking approval:', error);
     }
   }, [userAddress, candlesContract]);
+  
 
   useEffect(() => {
     if (isWalletConnected) {
@@ -1058,13 +1060,14 @@ const getPrestigeStatusFromCandleID = (candleID) => {
 
           <Button
             colorScheme={!isWalletConnected ? 'red' : isTransactionConfirmed ? 'yellow' : 'red'}
-            onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : performRitual}
+            onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : isCandleTransferApproved ? performRitual : approveCandles}
             m={4}
             isDisabled={!canClickCandles && !isTransactionConfirmed}
             _disabled={{ cursor: 'not-allowed' }}
           >
-            {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : 'Perform Ritual'}
+            {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : isCandleTransferApproved ? 'Perform Ritual' : 'Approve Transfer'}
           </Button>
+
 
 
 
