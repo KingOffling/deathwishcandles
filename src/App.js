@@ -654,6 +654,8 @@ function App() {
         showMessageModal('User rejected the Ritual transaction.');
       } else if (error.message.includes('execution reverted: You must own the DW365 token')) {
         showMessageModal(`Ritual failed: You must own the DW365 token.\n\nSelected Skull ID: ${selectedSkullId}\nIntended Skull ID: ${intendedSkullId}`);
+      } else if (error.message.includes('execution reverted: ERC1155: Caller is not owner nor approved')) {
+        showMessageModal('You have not yet approved transfer for your Candles.');
       } else {
         showMessageModal('Failed to perform ritual. Please try again later.');
       }
