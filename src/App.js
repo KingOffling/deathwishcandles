@@ -136,14 +136,24 @@ function App() {
       alert('Please install MetaMask!');
       return;
     }
-
-    await provider.send("eth_requestAccounts", []);
-    const address = await provider.getSigner().getAddress();
-    setIsWalletConnected(true);
-    setUserAddress(address);
-    const ensName = await getEnsName(address);
-    setDisplayAddress(ensName || formatAddress(address));
+  
+    try {
+      await provider.send("eth_requestAccounts", []);
+      const address = await provider.getSigner().getAddress();
+      setIsWalletConnected(true);
+      setUserAddress(address);
+      const ensName = await getEnsName(address);
+      setDisplayAddress(ensName || formatAddress(address));
+  
+      // Perform the approval check
+      const approvalStatus = await checkApproval();
+      setIsCandleTransferApproved(approvalStatus);
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      showMessageModal('Failed to connect the wallet. Please try again.');
+    }
   };
+  
 
 
   const getEnsName = useCallback(async (address) => {
@@ -956,7 +966,17 @@ function App() {
   };
 
 
-
+  useEffect(() => {
+    const checkAndSetApproval = async () => {
+      if (isWalletConnected) {
+        const approvalStatus = await checkApproval();
+        setIsCandleTransferApproved(approvalStatus);
+      }
+    };
+  
+    checkAndSetApproval();
+  }, [isWalletConnected, checkApproval]);
+  
 
   useEffect(() => {
     if (isWalletConnected) {
@@ -1104,28 +1124,29 @@ function App() {
             </Button>
           )}
 
-          <Button
-            colorScheme={
-              !isWalletConnected ? 'red' 
-              : isTransactionConfirmed ? 'yellow' 
-              : !isCandleTransferApproved ? 'blue' 
-              : 'red'
-            }
-            onClick={
-              !isWalletConnected ? connectWallet 
-              : isTransactionConfirmed ? resetState 
-              : isCandleTransferApproved ? performRitual 
-              : approveCandles
-            }
-            m={4}
-            isDisabled={!canClickCandles && !isTransactionConfirmed}
-            _disabled={{ cursor: 'not-allowed' }}
-          >
-            {!isWalletConnected ? 'Connect Wallet' 
-            : isTransactionConfirmed ? 'Reset Ritual' 
-            : isCandleTransferApproved ? 'Perform Ritual' 
-            : 'Approve Transfer'}
-          </Button>
+<Button
+  colorScheme={
+    !isWalletConnected ? 'red' 
+    : !isCandleTransferApproved ? 'blue' 
+    : isTransactionConfirmed ? 'yellow'
+    : 'red'
+  }
+  onClick={
+    !isWalletConnected ? connectWallet 
+    : !isCandleTransferApproved ? approveCandles
+    : isTransactionConfirmed ? resetState 
+    : performRitual
+  }
+  m={4}
+  isDisabled={!canClickCandles && !isTransactionConfirmed}
+  _disabled={{ cursor: 'not-allowed' }}
+>
+  {!isWalletConnected ? 'Connect Wallet' 
+  : !isCandleTransferApproved ? 'Approve Transfer' 
+  : isTransactionConfirmed ? 'Reset Ritual' 
+  : 'Perform Ritual'}
+</Button>
+
 
           {isWalletConnected ?
             <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
