@@ -116,8 +116,13 @@ function App() {
   const readOnlyProvider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/edd1ef15a39f46a495d9441c6bdb9c45");
 
   const provider = useMemo(() => {
-    return new ethers.providers.Web3Provider(window.ethereum);
+    if (window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum);
+    } else {
+      return new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/edd1ef15a39f46a495d9441c6bdb9c45");
+    }
   }, []);
+  
 
   const candlesContract = useMemo(() => {
     return new ethers.Contract("0x521945fDCEa1626E056E89A3abBDEe709cf3a837", candlesABI, provider);
@@ -861,7 +866,7 @@ function App() {
       5: 'Common',
     };
 
-    return mapping[candleID] || 'Unknown';  // Default to 'Unknown' if no mapping found
+    return mapping[candleID] || 'Unknown'; 
   };
 
 
