@@ -277,6 +277,14 @@ function App() {
     );
   };
 
+  const updateCandleQuantitiesPostTransaction = () => {
+    if (selectedCandle) {
+      setCandleQuantities(prevQuantities => ({
+        ...prevQuantities,
+        [selectedCandle]: Math.max(0, prevQuantities[selectedCandle] - 1) // Decrease by 1 but not below 0
+      }));
+    }
+  };
 
   //#endregion
 
@@ -664,6 +672,7 @@ function App() {
   const handleTransactionCompletion = () => {
     setIsTransactionConfirmed(true);
     setTransactionStage('complete');
+    updateCandleQuantitiesPostTransaction();
     setBurningCandle(selectedCandle);
     setIsRitualCompleteModalOpen(true);
   };
