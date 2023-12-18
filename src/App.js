@@ -164,21 +164,25 @@ function App() {
 
   // #region Approval Checks
 
-  const checkApproval = useCallback(async () => {
+  const checkApproval = async () => {
+    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
     try {
-      const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-      const isApproved = await candlesContract.isApprovedForAll(userAddress, spenderAddress);
-      setIsCandleTransferApproved(isApproved);
-  
-      if (!isApproved) {
-        setButtonText('Approve Transfer');
-        setButtonColor('yellow');
-        return;
-      }
+      return await candlesContract.isApprovedForAll(userAddress, spenderAddress);
     } catch (error) {
       console.error('Error checking approval:', error);
+      return false;
     }
-  }, [userAddress, candlesContract]);
+  };
+  
+  const requestApproval = async () => {
+    const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
+    try {
+      await candlesContract.setApprovalForAll(spenderAddress, true);
+    } catch (error) {
+      console.error('Error requesting approval:', error);
+    }
+  };
+  
   
 
   useEffect(() => {
@@ -624,6 +628,12 @@ function App() {
     }
 
     try {
+      const isApproved = await checkApproval();
+    if (!isApproved) {
+      await requestApproval();
+      return;
+    }
+
       // Check if the ritual is active
       const isRitualActive = await deathwishRitualsContract.ritualActive();
 
