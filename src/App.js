@@ -555,24 +555,41 @@ function App() {
   // #region Contract Approvals
 
   const approveCandles = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contractAddress = '0x521945fDCEa1626E056E89A3abBDEe709cf3a837';
+    const candlesContract = new ethers.Contract(contractAddress, candlesABI, signer);
+
+
     try {
       if (!window.ethereum || !window.ethereum.selectedAddress) {
         showMessageModal('You must connect a wallet first.');
         return;
       }
-
+  
       const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
-
-      await candlesContract.methods.setApprovalForAll(spenderAddress, true).send({ from: window.ethereum.selectedAddress });
-
+      const transaction = await candlesContract.setApprovalForAll(spenderAddress, true);
+      await transaction.wait(); // Wait for the transaction to be mined
+  
       setButtonText('Perform Ritual');
       setButtonColor('red');
+      showMessageModal('Transfer approval successful.');
     } catch (error) {
       console.error('Error approving candles:', error);
-      showMessageModal('There was an error approving the candles.');
-
+      if (error.code === 'ACTION_REJECTED') {
+        showMessageModal('You have rejected the transaction.');
+      } else if (error.code === 'INSUFFICIENT_FUNDS') {
+        showMessageModal('Transaction failed: Insufficient funds.');
+      } else if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {
+        showMessageModal('Transaction failed: Unpredictable gas limit.');
+      } else {
+        showMessageModal(`Error approving candles: ${error.message}`);
+      }
     }
   };
+  
+  
+  
 
 
 
@@ -1077,18 +1094,27 @@ function App() {
           )}
 
           <Button
-            colorScheme={!isWalletConnected ? 'red' : isTransactionConfirmed ? 'yellow' : 'red'}
-            onClick={!isWalletConnected ? connectWallet : isTransactionConfirmed ? resetState : isCandleTransferApproved ? performRitual : approveCandles}
+            colorScheme={
+              !isWalletConnected ? 'red' 
+              : isTransactionConfirmed ? 'yellow' 
+              : !isCandleTransferApproved ? 'blue' 
+              : 'red'
+            }
+            onClick={
+              !isWalletConnected ? connectWallet 
+              : isTransactionConfirmed ? resetState 
+              : isCandleTransferApproved ? performRitual 
+              : approveCandles
+            }
             m={4}
             isDisabled={!canClickCandles && !isTransactionConfirmed}
             _disabled={{ cursor: 'not-allowed' }}
           >
-            {!isWalletConnected ? 'Connect Wallet' : isTransactionConfirmed ? 'Reset Ritual' : isCandleTransferApproved ? 'Perform Ritual' : 'Approve Transfer'}
+            {!isWalletConnected ? 'Connect Wallet' 
+            : isTransactionConfirmed ? 'Reset Ritual' 
+            : isCandleTransferApproved ? 'Perform Ritual' 
+            : 'Approve Transfer'}
           </Button>
-
-
-
-
 
           {isWalletConnected ?
             <Text color="white" fontSize="small" opacity={.5}>{displayAddress}</Text> :
