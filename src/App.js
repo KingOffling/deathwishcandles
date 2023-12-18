@@ -138,25 +138,23 @@ function App() {
     }
   
     try {
-      // Request to connect wallet
       await provider.send("eth_requestAccounts", []);
-  
-      // Get the address of the connected account
       const signer = provider.getSigner();
       const address = await signer.getAddress();
+
+      if (address) {
+        setIsWalletConnected(true);
+        setUserAddress(address);
   
-      // Update state with wallet connection info
-      setIsWalletConnected(true);
-      setUserAddress(address);
+        const ensName = await getEnsName(address);
+        setDisplayAddress(ensName || formatAddress(address));
   
-      // Get ENS name if available and update display address
-      const ensName = await getEnsName(address);
-      setDisplayAddress(ensName || formatAddress(address));
+        const approvalStatus = await checkApproval();
+        setIsCandleTransferApproved(approvalStatus);
   
-      // Perform the approval check after ensuring the wallet is connected
-      const approvalStatus = await checkApproval();
-      setIsCandleTransferApproved(approvalStatus);
-  
+      } else {
+        console.error('No address returned from wallet');
+      }
     } catch (error) {
       console.error('Error connecting wallet:', error);
       showMessageModal('Failed to connect the wallet. Please try again.');
@@ -167,13 +165,17 @@ function App() {
 
   const getEnsName = useCallback(async (address) => {
     try {
-      const ensName = await provider.lookupAddress(address);
-      return ensName;
+      if (address && ethers.utils.isAddress(address)) {
+        const ensName = await provider.lookupAddress(address);
+        return ensName;
+      }
+      return null;
     } catch (error) {
       console.error("Error resolving ENS name:", error);
       return null;
     }
   }, [provider]);
+  
 
 
   const formatAddress = (address) => {
