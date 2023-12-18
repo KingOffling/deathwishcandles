@@ -66,7 +66,7 @@ function App() {
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
   const [inputSkullId, setInputSkullId] = useState('');
   const [inputEffect, setInputEffect] = useState('');
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const [isCandleTransferApproved, setIsCandleTransferApproved] = useState(false);
 
 
@@ -171,19 +171,25 @@ function App() {
       return await candlesContract.isApprovedForAll(userAddress, spenderAddress);
     } catch (error) {
       console.error('Error checking approval:', error);
+      showMessageModal('There was an issue checking the approval status. Please try again.');
       return false;
     }
-  }, [userAddress, candlesContract]); 
+  }, [userAddress, candlesContract, showMessageModal]); // Ensure showMessageModal is included if used
+
+
   const requestApproval = async () => {
     const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
     try {
       await candlesContract.setApprovalForAll(spenderAddress, true);
+      showMessageModal('Approval request submitted. Please confirm the transaction in your wallet.');
     } catch (error) {
       console.error('Error requesting approval:', error);
+      showMessageModal('There was an issue requesting approval. Please try again.');
     }
   };
-  
-  
+
+
+
 
   useEffect(() => {
     if (isWalletConnected) {
@@ -406,7 +412,7 @@ function App() {
         let displayText = ensName || `${owner.substring(0, 6)}...${owner.substring(owner.length - 6)}`;
         setButtonText(
           <>
-            Owned by:<br/>{displayText}
+            Owned by:<br />{displayText}
           </>
         );
         setButtonColor('black.500');
@@ -486,35 +492,35 @@ function App() {
                     boxSize="400px"
                     border="2px solid black"
                   />
-                   {!isMobile && (
-                      <div className="overlay-text">
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: calculateFontSize(),
-                            overflowWrap: "break-word",
-                            textAlign: "left",
-                            padding: "10px",
-                            marginBottom: "auto",
-                          }}
-                          className="description-text"
-                        >
-                          {skullDescription}
-                        </Text>
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: calculateFontSize(),
-                            overflowWrap: "break-word",
-                            textAlign: "right",
-                            padding: "10px"
-                          }}
-                          className="author-text"
-                        >
-                          {quoteAuthor}
-                        </Text>
-                      </div>
-                    )}
+                  {!isMobile && (
+                    <div className="overlay-text">
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: calculateFontSize(),
+                          overflowWrap: "break-word",
+                          textAlign: "left",
+                          padding: "10px",
+                          marginBottom: "auto",
+                        }}
+                        className="description-text"
+                      >
+                        {skullDescription}
+                      </Text>
+                      <Text
+                        style={{
+                          color: "white",
+                          fontSize: calculateFontSize(),
+                          overflowWrap: "break-word",
+                          textAlign: "right",
+                          padding: "10px"
+                        }}
+                        className="author-text"
+                      >
+                        {quoteAuthor}
+                      </Text>
+                    </div>
+                  )}
                 </div>
                 <div className="date-container">
                   <Text color="black" fontFamily={"Arial"} fontSize="12px">
@@ -539,12 +545,12 @@ function App() {
                 )}
 
                 {isMobile && (
-                        <div className="close-button-container">
-                          <Button className="close-button" colorScheme="red" onClick={() => setIsModalOpen(false)}>
-                            Close
-                          </Button>
-                        </div>
-                      )}
+                  <div className="close-button-container">
+                    <Button className="close-button" colorScheme="red" onClick={() => setIsModalOpen(false)}>
+                      Close
+                    </Button>
+                  </div>
+                )}
               </ModalBody>
 
             </ModalContent>
@@ -629,10 +635,10 @@ function App() {
 
     try {
       const isApproved = await checkApproval();
-    if (!isApproved) {
-      await requestApproval();
-      return;
-    }
+      if (!isApproved) {
+        await requestApproval();
+        return;
+      }
 
       // Check if the ritual is active
       const isRitualActive = await deathwishRitualsContract.ritualActive();
@@ -661,7 +667,7 @@ function App() {
     } catch (error) {
       console.error('Error performing ritual:', error);
       setTransactionStage('inert');
-      
+
       if (error.code === 'ACTION_REJECTED') {
         showMessageModal('User rejected the Ritual transaction.');
       } else if (error.message.includes('execution reverted: You must own the DW365 token')) {
@@ -756,10 +762,10 @@ function App() {
     const tweetSkulls = {
       1: 3,
       2: 5,
-      3: 7 
+      3: 7
     };
-    
-    
+
+
     const punchyComments = [
       "In the flicker of defiance, our shadows dance with fire.",
       "Candles aren't just for praying, they're for proclaiming power.",
@@ -811,10 +817,10 @@ function App() {
       'Skulls, not mere bone, but thrones of rebel souls.',
       'Where the fire rages, the truth’s raw face emerges.',
       "In the ritual's embrace, the world's facade crumbles."
-  ];
-  
-    
-    
+    ];
+
+
+
     const getRandomComment = () => {
       const randomIndex = Math.floor(Math.random() * punchyComments.length);
       return punchyComments[randomIndex];
@@ -833,7 +839,7 @@ function App() {
     };
 
     const skulls = getSkulls(selectedCandle);
-      // eslint-disable-next-line
+    // eslint-disable-next-line
     const skullImageUrl = getSkullImageUrl(selectedSkullId);
 
     const tweetContent = `🕯 A RITUAL HAS BEEN COMPLETED 🕯\n\n${skulls}\nThe ${candleType} has been lit\nDW365-${selectedSkullId} is now ${prestigeStatus}.\n${getRandomComment()}\n${skulls}\n\n#DeathWishRitual\n\nDo you have a DeathWish?\n@deathwishnft\ndeathwishnft.io\ndiscord.gg/deathwishnft`;
@@ -842,21 +848,21 @@ function App() {
     const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodedTweet}`;
 
     window.open(twitterIntentUrl, '_blank');
-};
-
-const getPrestigeStatusFromCandleID = (candleID) => {
-  const mapping = {
-    1: 'Mythic',
-    2: 'Epic', 
-    3: 'Rare',
-    4: 'Uncommon',
-    5: 'Common',
   };
 
-  return mapping[candleID] || 'Unknown';  // Default to 'Unknown' if no mapping found
-};
-  
-  
+  const getPrestigeStatusFromCandleID = (candleID) => {
+    const mapping = {
+      1: 'Mythic',
+      2: 'Epic',
+      3: 'Rare',
+      4: 'Uncommon',
+      5: 'Common',
+    };
+
+    return mapping[candleID] || 'Unknown';  // Default to 'Unknown' if no mapping found
+  };
+
+
   // #endregion
 
   // #region Message Modal
@@ -997,33 +1003,33 @@ const getPrestigeStatusFromCandleID = (candleID) => {
 
         {/* Ritual Complete Modal */}
         {selectedSkullId && (
-  <Modal isOpen={isRitualCompleteModalOpen} onClose={() => setIsRitualCompleteModalOpen(false)} isCentered>
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader fontFamily="Rockledge, sans-serif" fontSize="3xl" textAlign="center">Ritual Complete</ModalHeader>
-      <ModalBody display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-        <Image 
-          src={MainImage} 
-          alt={`Selected Skull ${selectedSkullId}`} 
-          boxSize={{ base: "60%", md: "90%" }} 
-          className={`${mainImageClass} ritual-complete-image`}
-          style={{ aspectRatio: '1 / 1' }} 
-        />
-        <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt="10px">DW365-{selectedSkullId.padStart(3, '0')}</Text>
-        <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)} mt="5px">
-          Prestige Status: {getPrestigeStatusFromCandleID(selectedCandle)}
-        </Text>
+          <Modal isOpen={isRitualCompleteModalOpen} onClose={() => setIsRitualCompleteModalOpen(false)} isCentered>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader fontFamily="Rockledge, sans-serif" fontSize="3xl" textAlign="center">Ritual Complete</ModalHeader>
+              <ModalBody display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+                <Image
+                  src={MainImage}
+                  alt={`Selected Skull ${selectedSkullId}`}
+                  boxSize={{ base: "60%", md: "90%" }}
+                  className={`${mainImageClass} ritual-complete-image`}
+                  style={{ aspectRatio: '1 / 1' }}
+                />
+                <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt="10px">DW365-{selectedSkullId.padStart(3, '0')}</Text>
+                <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)} mt="5px">
+                  Prestige Status: {getPrestigeStatusFromCandleID(selectedCandle)}
+                </Text>
 
-      </ModalBody>
-      <ModalFooter justifyContent="center">
-        <Button colorScheme="blue" onClick={handleBragClick}>Brag</Button>
-        {isMobile && (
-          <Button colorScheme="red" ml={3} onClick={() => setIsRitualCompleteModalOpen(false)}>Close</Button>
+              </ModalBody>
+              <ModalFooter justifyContent="center">
+                <Button colorScheme="blue" onClick={handleBragClick}>Brag</Button>
+                {isMobile && (
+                  <Button colorScheme="red" ml={3} onClick={() => setIsRitualCompleteModalOpen(false)}>Close</Button>
+                )}
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         )}
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-)}
 
 
 
@@ -1088,10 +1094,10 @@ const getPrestigeStatusFromCandleID = (candleID) => {
           }
 
 
-           {/* Input Field and Submit Button */}
-           <HStack alignSelf="center" ml={5}>
+          {/* Input Field and Submit Button */}
+          <HStack alignSelf="center" ml={5}>
             <Text color="white" fontFamily="Rockledge" fontSize="2xl" letterSpacing="0.15em" mr={"-10px"}>DW365-</Text>
-            <Input 
+            <Input
               value={inputSkullId}
               onChange={handleInputChange}
               placeholder="000"
@@ -1108,7 +1114,7 @@ const getPrestigeStatusFromCandleID = (candleID) => {
                 letterSpacing: '0.15em'
               }}
             />
-            <Button 
+            <Button
               onClick={handleSkullIdSubmit}
               size="sm"
               colorScheme="black"
@@ -1118,17 +1124,17 @@ const getPrestigeStatusFromCandleID = (candleID) => {
             </Button>
           </HStack>
 
-          
+
           <ScrollingSkullsGrid
             selectedSkullId={selectedSkullId}
             setSelectedSkullId={setSelectedSkullId}
             isModalOpen={isModalOpen}
           />
-        <HStack spacing={4} m={"20px"}>
-          <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Twitter</a>
-          <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>OpenSea</a>
-          <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Discord</a>
-        </HStack>
+          <HStack spacing={4} m={"20px"}>
+            <a href="https://twitter.com/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Twitter</a>
+            <a href="https://opensea.io/deathwish-365" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>OpenSea</a>
+            <a href="https://discord.gg/deathwishnft" target="_blank" rel="noopener noreferrer" style={{ color: '#636363' }}>Discord</a>
+          </HStack>
 
         </VStack>
       </div>
