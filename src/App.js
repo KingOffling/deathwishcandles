@@ -842,8 +842,9 @@ function App() {
     const skulls = getSkulls(selectedCandle);
     // eslint-disable-next-line
     const skullImageUrl = getSkullImageUrl(selectedSkullId);
+    const candlePrestigeStatus = getPrestigeStatusFromCandleID(selectedCandle);
 
-    const tweetContent = `🕯 A RITUAL HAS BEEN COMPLETED 🕯\n\n${skulls}\nThe ${candleType} has been lit\nDW365-${selectedSkullId} is now ${prestigeStatus}.\n${getRandomComment()}\n${skulls}\n\n#DeathWishRitual\n\nDo you have a DeathWish?\n@deathwishnft\ndeathwishnft.io\ndiscord.gg/deathwishnft`;
+    const tweetContent = `🕯 A RITUAL HAS BEEN COMPLETED 🕯\n\n${skulls}\nThe ${candleType} has been lit\nDW365-${selectedSkullId} is now ${candlePrestigeStatus}.\n${getRandomComment()}\n${skulls}\n\n#DeathWishRitual\n\nDo you have a DeathWish?\n@deathwishnft\ndeathwishnft.io\ndiscord.gg/deathwishnft`;
 
     const encodedTweet = encodeURIComponent(tweetContent);
     const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodedTweet}`;
