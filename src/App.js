@@ -820,6 +820,18 @@ function App() {
 
     window.open(twitterIntentUrl, '_blank');
 };
+
+const getPrestigeStatusFromCandleID = (candleID) => {
+  const mapping = {
+    1: 'Mythic',
+    2: 'Epic', 
+    3: 'Rare',
+    4: 'Uncommon',
+    5: 'Common',
+  };
+
+  return mapping[candleID] || 'Unknown';  // Default to 'Unknown' if no mapping found
+};
   
   
   // #endregion
@@ -976,8 +988,9 @@ function App() {
         />
         <Text fontFamily="Rockledge, sans-serif" fontSize="3xl" mt="10px">DW365-{selectedSkullId.padStart(3, '0')}</Text>
         <Text fontFamily="Rockledge, sans-serif" style={getPrestigeStatusStyle(prestigeStatus)} mt="5px">
-          Prestige Status: {prestigeStatus}
+          Prestige Status: {getPrestigeStatusFromCandleID(selectedCandle)}
         </Text>
+
       </ModalBody>
       <ModalFooter justifyContent="center">
         <Button colorScheme="blue" onClick={handleBragClick}>Brag</Button>
