@@ -66,6 +66,7 @@ function App() {
   const [isRitualCompleteModalOpen, setIsRitualCompleteModalOpen] = useState(false);
   const [inputSkullId, setInputSkullId] = useState('');
   const [inputEffect, setInputEffect] = useState('');
+    // eslint-disable-next-line
   const [isCandleTransferApproved, setIsCandleTransferApproved] = useState(false);
 
 
@@ -164,7 +165,7 @@ function App() {
 
   // #region Approval Checks
 
-  const checkApproval = async () => {
+  const checkApproval = useCallback(async () => {
     const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
     try {
       return await candlesContract.isApprovedForAll(userAddress, spenderAddress);
@@ -172,8 +173,7 @@ function App() {
       console.error('Error checking approval:', error);
       return false;
     }
-  };
-  
+  }, [userAddress, candlesContract]); 
   const requestApproval = async () => {
     const spenderAddress = '0xb4449C28e27b1bD9D74083B80183b65EaB67E49e';
     try {
