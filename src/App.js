@@ -684,6 +684,8 @@ function App() {
         showMessageModal('Failed to perform ritual. Please try again later.');
       }
     }
+
+    updateMetadataOnOpenSea(intendedSkullId)
   };
 
 
@@ -751,6 +753,15 @@ function App() {
     setMainImageClass(className);
   }, [transactionStage, selectedCandle]);
 
+
+  function updateMetadataOnOpenSea(tokenId) {
+    const url = `https://api.opensea.io/api/v1/asset/0x67e3e965ce5ae4d6a49ac643205897acb32fcf6e/${tokenId}/?force_update=true`;
+
+    fetch(url, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+}
 
 
 
